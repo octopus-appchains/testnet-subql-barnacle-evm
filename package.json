@@ -1,0 +1,35 @@
+{
+  "name": "testnet-subql-barnacle-evm",
+  "version": "0.0.4",
+  "description": "This SubQuery project can be use as a st...",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "prepack": "rm -rf dist && npm build",
+    "test": "jest",
+    "codegen": "./node_modules/.bin/subql codegen"
+  },
+  "homepage": "https://github.com/subquery/moonbeam-subql-starter",
+  "repository": "github:subquery/moonbeam-subql-starter",
+  "files": [
+    "dist",
+    "schema.graphql",
+    "project.yaml"
+  ],
+  "author": "Octopus Network",
+  "license": "MIT",
+  "dependencies": {
+    "moonbeam-types-bundle": "^2.0.3"
+  },
+  "devDependencies": {
+    "@polkadot/api": "^7",
+    "@subql/types": "latest",
+    "typescript": "^4.1.3",
+    "@subql/cli": "latest",
+    "@subql/contract-processors": "0.5.3",
+    "moonbeam-types-bundle": "^2.0.3"
+  },
+  "exports": {
+    "chaintypes": "src/chaintypes.ts"
+  }
+}
