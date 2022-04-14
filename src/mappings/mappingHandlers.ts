@@ -22,5 +22,5 @@ export async function handleCall(extrinsic: SubstrateExtrinsic): Promise<void> {
 export {
     handleFrontierEvmEvent,
     handleFrontierEvmCall
-} from "../handlers/frontier-evm-handlers";
+} from "../handlers";
 
