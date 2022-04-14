@@ -9,7 +9,7 @@ import { TransferHandler } from './sub-handlers/transfer'
 type EventDispatch = Dispatcher<SubstrateEvent>
 
 export class EventHandler {
-  private event: SubstrateEvent 
+  private event: SubstrateEvent
   private dispatcher: EventDispatch
 
   constructor(event: SubstrateEvent) {
@@ -19,45 +19,45 @@ export class EventHandler {
     this.registerDispatcherHandler()
   }
 
-  private registerDispatcherHandler () {
-    this.dispatcher.batchRegist([ ])
+  private registerDispatcherHandler() {
+    this.dispatcher.batchRegist([])
   }
 
-  get index () {
+  get index() {
     return this.event.idx
   }
 
-  get blockNumber () {
+  get blockNumber() {
     return this.event.block.block.header.number.toBigInt()
   }
 
-  get blockHash () {
+  get blockHash() {
     return this.event.block.block.hash.toString()
   }
 
-  get section () {
+  get section() {
     return this.event.event.section
   }
 
-  get method () {
+  get method() {
     return this.event.event.method
   }
 
-  get data () {
-    return this.event.event.data.toString()
+  get data() {
+    return this.event.event.data.toHuman() as string
   }
 
-  get extrinsicHash () {
+  get extrinsicHash() {
     const i = this.event?.extrinsic?.extrinsic?.hash?.toString()
 
     return i === 'null' ? undefined : i
   }
 
-  get id () {
+  get id() {
     return `${this.blockNumber}-${this.index}`
   }
 
-  public async save () {
+  public async save() {
     const event = new Event(this.id)
 
     await BlockHandler.ensureBlock(this.blockHash)
