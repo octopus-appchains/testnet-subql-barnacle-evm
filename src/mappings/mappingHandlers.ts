@@ -20,7 +20,7 @@ export async function handleCall(extrinsic: SubstrateExtrinsic): Promise<void> {
 }
 
 export {
-    handleFrontierEvmEvent,
-    handleFrontierEvmCall
+    handleErc20Transaction,
+    handleErc20Approval
 } from "../handlers";
 

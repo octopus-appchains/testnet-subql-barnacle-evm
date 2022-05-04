@@ -36,44 +36,26 @@ dataSources:
       options:
         # Must be a key of assets
         abi: erc20
-        ## The contract that emitted the event
-        address: "0x19A6639C867CC2e3A468d56a1f5eBB8a85BE4FEC"
     assets:
       erc20:
         file: "./erc20.abi.json"
     mapping:
       file: "./dist/index.js"
       handlers:
-        - handler: handleFrontierEvmEvent
+        - handler: handleErc20Transaction
           kind: substrate/FrontierEvmEvent
           filter:
-            ## Topics that follow Ethereum JSON-RPC log filters
-            ## https://docs.ethers.io/v5/concepts/events/
-            ## With a couple of added benefits:
-            ##  - Values don't need to be 0 padded
-            ##  - Event fragments can be provided and automatically converted to their id
             topics:
-              ## Example valid values:
-              # - '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-              # - Transfer(address,address,u256)
-              # - Transfer(address from,address to,uint256 value)
-
-              ## Example of OR filter, will capture Transfer or Approval events
-              # - - 'Transfer(address indexed from,address indexed to,uint256 value)'
-              #   - 'Approval(address indexed owner, address indexed spender, uint256 value)'
-
               - Transfer(address indexed from,address indexed to,uint256 value)
-              ## topics[1] to topics[3] are the indexed values
-              - null
-              - null
-              - null
-        - handler: handleFrontierEvmCall
-          kind: substrate/FrontierEvmCall
+
+        - handler: handleErc20Approval
+          kind: substrate/FrontierEvmEvent
           filter:
-            ## The function can either be the method fragment or signature
-            # function: '0x095ea7b3'
-            # function: '0x7ff36ab500000000000000000000000000000000000000000000000000000000'
-            # function: approve(address,uint256)
-            function: approve(address to,uint256 value)
-            ## The transaction sender
-            from: "0x19A6639C867CC2e3A468d56a1f5eBB8a85BE4FEC"
+            topics:
+              - Approval(address indexed owner, address indexed spender, uint256 value)
+
+        - handler: handleEvmCall
+          kind: substrate/FrontierEvmCall
+
+        - handler: handleEvmEvent
+          kind: substrate/FrontierEvmEvent

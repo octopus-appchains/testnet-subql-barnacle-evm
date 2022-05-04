@@ -89,24 +89,37 @@ type SystemTokenTransfer @entity {
   extrinsic: Extrinsic
 }
 
-type Transaction @entity {
+type Erc20Transaction @entity {
   id: ID! # Transaction hash
   value: BigInt!
-
-  to: String!
-
   from: String!
-
+  to: String!
   contractAddress: String!
 }
 
-type Approval @entity {
+type Erc20Approval @entity {
   id: ID! # Transaction hash
   value: BigInt!
-
   owner: String!
-
   spender: String!
-
   contractAddress: String!
+}
+
+type EvmCall @entity {
+  id: ID! # Transaction hash
+  from: String!
+  to: String!
+  args: String!
+  raw: String!
+  type: Int!
+  isSuccess: Boolean!
+}
+
+type EvmEvent @entity {
+  id: ID! # Transaction hash
+  address: String!
+  data: String!
+  args: String!
+  topics: [String]
+  index: Int!
 }
