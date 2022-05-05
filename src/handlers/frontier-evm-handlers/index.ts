@@ -28,26 +28,3 @@ export async function handleErc20Approval(event: FrontierEvmEvent<ApproveEventAr
 
   await erc20Approval.save();
 }
-
-export async function handleEvmCall(call: FrontierEvmCall): Promise<void> {
-  const evmCall = new EvmCall(call.hash);
-
-  evmCall.from = call.from;
-  evmCall.to = call.to;
-  evmCall.args = JSON.stringify(call.args);
-  evmCall.raw = call.raw;
-  evmCall.type = call.type;
-  evmCall.isSuccess = call.success;
-
-  await evmCall.save();
-}
-
-export async function handleEvmEvent(event: FrontierEvmEvent): Promise<void> {
-  const evmEvent = new EvmEvent(`${event.transactionHash}-${event.logIndex}`);
-  evmEvent.address = event.address;
-  evmEvent.data = event.data;
-  evmEvent.args = JSON.stringify(event.args);
-  evmEvent.topics = event.topics;
-  evmEvent.index = event.logIndex;
-  await evmEvent.save();
-}

@@ -53,9 +53,3 @@ dataSources:
           filter:
             topics:
               - Approval(address indexed owner, address indexed spender, uint256 value)
-
-        - handler: handleEvmCall
-          kind: substrate/FrontierEvmCall
-
-        - handler: handleEvmEvent
-          kind: substrate/FrontierEvmEvent
