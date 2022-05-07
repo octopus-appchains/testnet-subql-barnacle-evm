@@ -60,7 +60,7 @@ dataSources:
         # Must be a key of assets
         abi: sopometa
     assets:
-      erc20:
+      sopometa:
         file: "./sopometa.abi.json"
     mapping:
       file: "./dist/index.js"
