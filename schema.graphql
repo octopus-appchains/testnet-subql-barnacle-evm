@@ -90,7 +90,7 @@ type SystemTokenTransfer @entity {
 }
 
 type Erc20Transaction @entity {
-  id: ID! # Transaction hash
+  id: ID!
   value: BigInt!
   from: String!
   to: String!
@@ -98,28 +98,69 @@ type Erc20Transaction @entity {
 }
 
 type Erc20Approval @entity {
-  id: ID! # Transaction hash
+  id: ID!
   value: BigInt!
   owner: String!
   spender: String!
   contractAddress: String!
 }
 
-type EvmCall @entity {
-  id: ID! # Transaction hash
-  from: String!
-  to: String!
-  args: String!
-  raw: String!
-  type: Int!
-  isSuccess: Boolean!
+type SopometaForsell @entity {
+  id: ID!
+  contractAddress: String!
+  sopo_id: BigInt
+  price: BigInt
 }
 
-type EvmEvent @entity {
-  id: ID! # Transaction hash
-  address: String!
-  data: String!
-  args: String!
-  topics: [String]
-  index: Int!
+type SopometaListandforsell @entity {
+  id: ID!
+  contractAddress: String!
+  from: String
+  to: String
+  sopo_id: BigInt
+  nft_id: BigInt
+  nft_programe_address: String
+  price: BigInt
+}
+
+type SopometaListed @entity {
+  id: ID!
+  contractAddress: String!
+  from: String
+  to: String
+  sopo_id: BigInt
+  nft_id: BigInt
+  nft_programe_address: String
+}
+
+type SopometaNewoffer @entity {
+  id: ID!
+  contractAddress: String!
+  from: String
+  to: String
+  sopo_id: BigInt
+  price: BigInt
+}
+
+type SopometaSelled @entity {
+  id: ID!
+  contractAddress: String!
+  from: String
+  to: String
+  sopo_id: BigInt
+  selled_at: Int
+  nft_id: BigInt
+  nft_programe_address: String
+  owner: String
+}
+
+type SopometaWithdraw @entity {
+  id: ID!
+  contractAddress: String!
+  from: String
+  to: String
+  sopo_id: BigInt
+  nft_id: BigInt
+  nft_programe_address: String
+  withdrawout_at: Int
 }
