@@ -21,6 +21,12 @@ export async function handleCall(extrinsic: SubstrateExtrinsic): Promise<void> {
 
 export {
     handleErc20Transaction,
-    handleErc20Approval
+    handleErc20Approval,
+    handleSopometaForsell,
+    handleSopometaListandforsell,
+    handleSopometaListed,
+    handleSopometaNewoffer,
+    handleSopometaSelled,
+    handleSopometaWithdraw
 } from "../handlers";
 

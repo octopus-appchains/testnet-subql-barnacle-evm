@@ -8,6 +8,7 @@ type TransferEventArgs = [string, string, BigNumber] & { from: string; to: strin
 type ApproveEventArgs = [string, string, BigNumber] & { owner: string; spender: string; value: BigNumber; }
 
 export async function handleErc20Transaction(event: FrontierEvmEvent<TransferEventArgs>): Promise<void> {
+  console.error("event", event);
   const erc20Transaction = new Erc20Transaction(`${event.transactionHash}-${event.logIndex}`);
 
   erc20Transaction.value = event.args.value.toBigInt();
