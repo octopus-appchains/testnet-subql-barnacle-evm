@@ -8,7 +8,7 @@ schema:
 network:
   endpoint: >-
     wss://gateway.testnet.octopus.network/barnacle-evm/wj1hhcverunusc35jifki19otd4od1n5
-  genesisHash: "0xd0599a36a2fb1e958d74c51c439b63f5ee91b7c107940caec1ec78958c2d3422"
+  genesisHash: "0xbd46443c4c65faf52b5f61b480e6dc693adffd498bd91d93c05e9d797fd61216"
   dictionary: https://api.subquery.network/sq/subquery/moonbeam-dictionary
   chaintypes:
     file: ./dist/chaintypes.js
