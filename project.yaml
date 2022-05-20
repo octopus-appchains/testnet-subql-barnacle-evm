@@ -14,7 +14,7 @@ network:
     file: ./dist/chaintypes.js
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 395315
+    startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:
@@ -29,71 +29,3 @@ dataSources:
           filter:
             module: balances
             method: Transfer
-  - kind: substrate/FrontierEvm
-    startBlock: 395315
-    processor:
-      file: "./node_modules/@subql/contract-processors/dist/frontierEvm.js"
-      options:
-        # Must be a key of assets
-        abi: erc20
-        address: "0xfc57dF5E0C359238e0e898A31466F4FC38edBAF4"
-    assets:
-      erc20:
-        file: "./erc20.abi.json"
-    mapping:
-      file: "./dist/index.js"
-      handlers:
-        - handler: handleErc20Transaction
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Transfer(address indexed from,address indexed to,uint256 value)
-        - handler: handleErc20Approval
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Approval(address indexed owner, address indexed spender, uint256 value)
-  - kind: substrate/FrontierEvm
-    startBlock: 395315
-    processor:
-      file: "./node_modules/@subql/contract-processors/dist/frontierEvm.js"
-      options:
-        # Must be a key of assets
-        abi: sopometa
-        address: "0x5c4242beB94dE30b922f57241f1D02f36e906915"
-    assets:
-      sopometa:
-        file: "./sopometa.abi.json"
-    mapping:
-      file: "./dist/index.js"
-      handlers:
-        - handler: handleSopometaForsell
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Forsell(uint256 indexed sopo_id, uint256 indexed price)
-        - handler: handleSopometaListandforsell
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Listandforsell(address indexed from, address to, uint256 sopo_id, uint256 nft_id, address indexed nft_programe_address, uint256 indexed price)
-        - handler: handleSopometaListed
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Listed(address indexed from, address to, uint256 indexed sopo_id, uint256 nft_id, address indexed nft_programe_address)
-        - handler: handleSopometaNewoffer
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Newoffer(address indexed from, address indexed to, uint256 sopo_id, uint256 indexed price)
-        - handler: handleSopometaSelled
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Selled(address indexed from, address to, uint256 sopo_id, uint32 indexed selled_at, uint256 nft_id, address indexed nft_programe_address, address owner)
-        - handler: handleSopometaWithdraw
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - Withdraw(address indexed from, address to, uint256 sopo_id, uint256 nft_id, address indexed nft_programe_address, uint32 indexed withdrawout_at)
