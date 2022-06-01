@@ -20,12 +20,64 @@ dataSources:
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
-        - handler: handleEvent
-          kind: substrate/EventHandler
-        - handler: handleCall
-          kind: substrate/CallHandler
-        - handler: systemTokenTransferEvent
-          kind: substrate/EventHandler
+  - kind: substrate/FrontierEvm
+    startBlock: 285000
+    processor:
+      file: "./node_modules/@subql/contract-processors/dist/frontierEvm.js"
+      options:
+        # Must be a key of assets
+        abi: sopometa721nft
+    assets:
+      sopometa721nft:
+        file: "./sopometa721nft.abi.json"
+    mapping:
+      file: "./dist/index.js"
+      handlers:
+        - handler: handleSopometa721nftApproval
+          kind: substrate/FrontierEvmEvent
           filter:
-            module: balances
-            method: Transfer
+            topics:
+              - Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
+        - handler: handleSopometa721nftApprovalForAll
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - ApprovalForAll(address indexed owner, address indexed operator, bool approved)
+        - handler: handleSopometa721nftTransfer
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
+  - kind: substrate/FrontierEvm
+    startBlock: 285000
+    processor:
+      file: "./node_modules/@subql/contract-processors/dist/frontierEvm.js"
+      options:
+        # Must be a key of assets
+        abi: sopometaMarket
+    assets:
+      sopometaMarket:
+        file: "./sopometaMarket.abi.json"
+    mapping:
+      file: "./dist/index.js"
+      handlers:
+        - handler: handleSopometaMarketApprovalForAll
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - ApprovalForAll(address indexed account, address indexed operator, bool approved)
+        - handler: handleSopometaMarketTransferBatch
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - TransferBatch(address indexed operator, address indexed from, address indexed to, uint256[] ids, uint256[] values)
+        - handler: handleSopometaMarketTransferSingle
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)
+        - handler: handleSopometaMarketURI
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - URI(string value, uint256 indexed id)

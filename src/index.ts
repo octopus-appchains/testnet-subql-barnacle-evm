@@ -1,3 +1,2 @@
-//Exports all handler functions
-export * from './mappings/mappingHandlers'
-export * from './mappings/mappingSystemTokenHandlers'
+import '@polkadot/api-augment';
+export * from "./mappings/mappingHandlers";

@@ -1,8 +1,8 @@
 type Block @entity {
   id: ID!
 
-  number: BigInt
-  timestamp: Date
+  number: BigInt @index
+  timestamp: Date @index
   parentHash: String
   specVersion: Int
 
@@ -13,12 +13,13 @@ type Block @entity {
 type Extrinsic @entity {
   id: ID!
 
-  method: String
-  section: String
+  hash: String!
+  method: String @index
+  section: String @index
   args: String
-  signer: Account #create relation to account
+  signer: Account @index #create relation to account
   nonce: BigInt
-  timestamp: Date
+  timestamp: Date @index
   signature: String
   tip: BigInt
   isSigned: Boolean
@@ -33,8 +34,8 @@ type Event @entity {
   id: ID!
 
   index: Int!
-  section: String!
-  method: String!
+  section: String! @index
+  method: String! @index
   data: String!
 
   block: Block #create relation to block
@@ -44,10 +45,10 @@ type Event @entity {
 type Call @entity {
   id: ID!
 
-  section: String
-  method: String
+  section: String @index
+  method: String @index
   args: String
-  timestamp: Date
+  timestamp: Date @index
   isSuccess: Boolean
 
   signer: Account #create ration to account
@@ -58,109 +59,78 @@ type Call @entity {
 
 type Account @entity {
   id: ID!
+  timestamp: Date!
 
   extrinsics: [Extrinsic] @derivedFrom(field: "signer")
   calls: [Call] @derivedFrom(field: "signer")
 
-  transferIn: [Transfer] @derivedFrom(field: "to")
-  transferOut: [Transfer] @derivedFrom(field: "from")
-}
-
-type Transfer @entity {
-  id: ID!
-
-  from: Account
-  to: Account
-  amount: BigInt
-
-  extrinsic: Extrinsic #create relation to extrinsic
-  call: Call #create relation to call
-  timestamp: Date
-  isSuccess: Boolean
+  transferIn: [SystemTokenTransfer] @derivedFrom(field: "to")
+  transferOut: [SystemTokenTransfer] @derivedFrom(field: "from")
 }
 
 type SystemTokenTransfer @entity {
   id: ID!
 
-  from: Account
-  to: Account
-  amount: BigInt
-  timestamp: Date
+  from: Account @index
+  to: Account @index
+  amount: BigInt @index
+  timestamp: Date @index
   extrinsic: Extrinsic
 }
 
-type Erc20Transaction @entity {
+type Sopometa721nftApproval @entity {
   id: ID!
-  value: BigInt!
-  from: String!
-  to: String!
-  contractAddress: String!
+  contractAddress: String! @index
+  owner: String @index
+  approved: String @index
+  tokenId: BigInt @index
 }
 
-type Erc20Approval @entity {
+type Sopometa721nftApprovalForAll @entity {
   id: ID!
-  value: BigInt!
-  owner: String!
-  spender: String!
-  contractAddress: String!
+  contractAddress: String! @index
+  owner: String @index
+  operator: String @index
+  approved: Boolean
 }
 
-type SopometaForsell @entity {
+type Sopometa721nftTransfer @entity {
   id: ID!
-  contractAddress: String!
-  sopo_id: BigInt
-  price: BigInt
+  contractAddress: String! @index
+  from: String @index
+  to: String @index
+  tokenId: BigInt @index
 }
 
-type SopometaListandforsell @entity {
+type SopometaMarketApprovalForAll @entity {
   id: ID!
-  contractAddress: String!
-  from: String
-  to: String
-  sopo_id: BigInt
-  nft_id: BigInt
-  nft_programe_address: String
-  price: BigInt
+  contractAddress: String! @index
+  account: String @index
+  operator: String @index
+  approved: Boolean
 }
 
-type SopometaListed @entity {
+type SopometaMarketTransferBatch @entity {
   id: ID!
-  contractAddress: String!
-  from: String
-  to: String
-  sopo_id: BigInt
-  nft_id: BigInt
-  nft_programe_address: String
+  contractAddress: String! @index
+  operator: String @index
+  from: String @index
+  to: String @index
+  ids: [BigInt]
+  values: [BigInt]
 }
 
-type SopometaNewoffer @entity {
+type SopometaMarketTransferSingle @entity {
   id: ID!
-  contractAddress: String!
-  from: String
-  to: String
-  sopo_id: BigInt
-  price: BigInt
+  contractAddress: String! @index
+  operator: String @index
+  from: String @index
+  to: String @index
+  value: BigInt
 }
 
-type SopometaSelled @entity {
+type SopometaMarketURI @entity {
   id: ID!
   contractAddress: String!
-  from: String
-  to: String
-  sopo_id: BigInt
-  selled_at: Int
-  nft_id: BigInt
-  nft_programe_address: String
-  owner: String
-}
-
-type SopometaWithdraw @entity {
-  id: ID!
-  contractAddress: String!
-  from: String
-  to: String
-  sopo_id: BigInt
-  nft_id: BigInt
-  nft_programe_address: String
-  withdrawout_at: Int
+  value: String
 }
