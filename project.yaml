@@ -21,7 +21,7 @@ dataSources:
         - handler: handleBlock
           kind: substrate/BlockHandler
   - kind: substrate/FrontierEvm
-    startBlock: 285000
+    startBlock: 1
     processor:
       file: "./node_modules/@subql/contract-processors/dist/frontierEvm.js"
       options:
@@ -49,7 +49,7 @@ dataSources:
             topics:
               - Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
   - kind: substrate/FrontierEvm
-    startBlock: 285000
+    startBlock: 1
     processor:
       file: "./node_modules/@subql/contract-processors/dist/frontierEvm.js"
       options:
