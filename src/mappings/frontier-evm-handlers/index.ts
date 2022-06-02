@@ -14,9 +14,7 @@ import { FrontierEvmEvent, FrontierEvmCall } from '@subql/contract-processors/di
 // Setup types from ABI
 type Sopometa721nftApprovalArgs = [string, string, BigNumber] & { owner: string; approved: string; tokenId: BigNumber; };
 export async function handleSopometa721nftApproval(event: FrontierEvmEvent<Sopometa721nftApprovalArgs>): Promise<void> {
-  logger.info("handleSopometa721nftApproval/////");
   const data = new Sopometa721nftApproval(event.transactionHash + "-" + event.logIndex);
-
   data.contractAddress = event.address;
 
   data.owner = event.args.owner;
@@ -29,9 +27,7 @@ export async function handleSopometa721nftApproval(event: FrontierEvmEvent<Sopom
 
 type Sopometa721nftApprovalForAllArgs = [string, string, boolean] & { owner: string; operator: string; approved: boolean; };
 export async function handleSopometa721nftApprovalForAll(event: FrontierEvmEvent<Sopometa721nftApprovalForAllArgs>): Promise<void> {
-  logger.info("handleSopometa721nftApprovalForAll/////");
   const data = new Sopometa721nftApprovalForAll(event.transactionHash + "-" + event.logIndex);
-
   data.contractAddress = event.address;
 
   data.owner = event.args.owner;
@@ -44,9 +40,7 @@ export async function handleSopometa721nftApprovalForAll(event: FrontierEvmEvent
 
 type Sopometa721nftTransferArgs = [string, string, BigNumber] & { from: string; to: string; tokenId: BigNumber; };
 export async function handleSopometa721nftTransfer(event: FrontierEvmEvent<Sopometa721nftTransferArgs>): Promise<void> {
-  logger.info("handleSopometa721nftTransfer/////");
   const data = new Sopometa721nftTransfer(event.transactionHash + "-" + event.logIndex);
-
   data.contractAddress = event.address;
 
   data.from = event.args.from;
@@ -58,9 +52,7 @@ export async function handleSopometa721nftTransfer(event: FrontierEvmEvent<Sopom
 
 type SopometaMarketApprovalForAllArgs = [string, string, boolean] & { account: string; operator: string; approved: boolean; };
 export async function handleSopometaMarketApprovalForAll(event: FrontierEvmEvent<SopometaMarketApprovalForAllArgs>): Promise<void> {
-  logger.info("handleSopometaMarketApprovalForAll/////");
-  const id = (event.transactionHash + "-" + event.logIndex) + "";
-  const data = new SopometaMarketApprovalForAll(id);
+  const id = (event.transactionHash + "-" + event.logIndex) + ""; const data = new SopometaMarketApprovalForAll(id);
 
   data.contractAddress = event.address;
 
@@ -74,9 +66,7 @@ export async function handleSopometaMarketApprovalForAll(event: FrontierEvmEvent
 
 type SopometaMarketTransferBatchArgs = [string, string, string, BigNumber[], BigNumber[]] & { operator: string; from: string; to: string; ids: BigNumber[]; values: BigNumber[]; };
 export async function handleSopometaMarketTransferBatch(event: FrontierEvmEvent<SopometaMarketTransferBatchArgs>): Promise<void> {
-  logger.info("handleSopometaMarketTransferBatch/////");
-  const id = (event.transactionHash + "-" + event.logIndex) + "";
-  const data = new SopometaMarketTransferBatch(id);
+  const id = (event.transactionHash + "-" + event.logIndex) + ""; const data = new SopometaMarketTransferBatch(id);
 
   data.contractAddress = event.address;
 
@@ -92,9 +82,7 @@ export async function handleSopometaMarketTransferBatch(event: FrontierEvmEvent<
 
 type SopometaMarketTransferSingleArgs = [string, string, string, BigNumber, BigNumber] & { operator: string; from: string; to: string; id: BigNumber; value: BigNumber; };
 export async function handleSopometaMarketTransferSingle(event: FrontierEvmEvent<SopometaMarketTransferSingleArgs>): Promise<void> {
-  logger.info("handleSopometaMarketTransferSingle/////");
-  const id = (event.args?.id) + "";
-  const data = new SopometaMarketTransferSingle(id);
+  const id = (event.args?.id) + ""; const data = new SopometaMarketTransferSingle(id);
 
   data.contractAddress = event.address;
 
@@ -109,9 +97,7 @@ export async function handleSopometaMarketTransferSingle(event: FrontierEvmEvent
 
 type SopometaMarketURIArgs = [string, BigNumber] & { value: string; id: BigNumber; };
 export async function handleSopometaMarketURI(event: FrontierEvmEvent<SopometaMarketURIArgs>): Promise<void> {
-  logger.info("handleSopometaMarketURI/////");
-  const id = (event.args?.id) + "";
-  const data = new SopometaMarketURI(id);
+  const id = (event.args?.id) + ""; const data = new SopometaMarketURI(id);
 
   data.contractAddress = event.address;
 
