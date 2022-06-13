@@ -2,7 +2,7 @@ import type { Vec, u32 } from '@polkadot/types'
 import { EventRecord, DispatchError } from "@polkadot/types/interfaces";
 import { AccountId, Balance } from '@polkadot/types/interfaces/runtime';
 import { SubstrateExtrinsic, SubstrateBlock } from "@subql/types";
-import { Block, Event, Extrinsic, Call, Account, SystemTokenTransfer } from "../types";
+import { Block, Event, Extrinsic, Call, Account, SystemTokenTransfer, EvmLog } from "../types";
 import { AnyCall } from './types'
 import { IEvent } from '@polkadot/types/types'
 import _ from "lodash";
@@ -28,6 +28,7 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
   const newCalls: Call[] = extrinsicWraps.reduce((cs, { newCalls }) => [...cs, ...newCalls], []);
   const newEvents: Event[] = extrinsicWraps.reduce((es, { newEvents }) => [...es, ...newEvents], []);
   const newSystemTokenTransfers: SystemTokenTransfer[] = extrinsicWraps.reduce((ss, { newSystemTokenTransfers }) => [...ss, ...newSystemTokenTransfers], []);
+  const newEvmLogs: EvmLog[] = extrinsicWraps.reduce((ls, { newEvmLogs }) => [...ls, ...newEvmLogs], []);
   const accounts: Account[] = _.uniqBy(extrinsicWraps.reduce((as, { accounts }) => [...as, ...accounts], []), "id");
 
   await newBlock.save();
@@ -46,6 +47,7 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
     store.bulkCreate("Call", newCalls),
     store.bulkCreate("Event", newEvents),
     store.bulkCreate("SystemTokenTransfer", newSystemTokenTransfers),
+    store.bulkCreate("EvmLog", newEvmLogs),
   ]);
 }
 
@@ -59,6 +61,7 @@ function handleExtrinsic(
   newCalls: Call[],
   newEvents: Event[],
   newSystemTokenTransfers: SystemTokenTransfer[],
+  newEvmLogs: EvmLog[],
   accounts: Account[]
 } {
   const extrinsicId = `${block.block.header.number}-${idx}`;
@@ -80,14 +83,16 @@ function handleExtrinsic(
 
   const newEvents = [];
   const newSystemTokenTransfers = [];
+  const newEvmLogs = [];
   extrinsic.events
     .forEach((evt, idx) => {
       newEvents.push(handleEvent(block, extrinsic, evt, extrinsicId, startEvtIdx + idx));
       if (evt.event.section === "balances" && evt.event.method === "Transfer") {
         newSystemTokenTransfers.push(handleSystemTokenTransfer(block, extrinsic, evt, extrinsicId, startEvtIdx + idx));
+      } else if (evt.event.section === "evm" && evt.event.method === "Log") {
+        newEvmLogs.push(handleEvmLog(block, extrinsic, evt, extrinsicId, startEvtIdx + idx));
       }
     });
-
 
   const accountIds = [newExtrinsic.signerId];
   newSystemTokenTransfers.forEach(t => accountIds.push(t.fromId, t.toId));
@@ -98,7 +103,7 @@ function handleExtrinsic(
     return account;
   });
 
-  return { newExtrinsic, newCalls, newEvents, newSystemTokenTransfers, accounts };
+  return { newExtrinsic, newCalls, newEvents, newSystemTokenTransfers, newEvmLogs, accounts };
 }
 
 function handleCalls(
@@ -223,5 +228,26 @@ function getBatchInterruptedIndex(extrinsic: SubstrateExtrinsic): number {
   return -1
 }
 
+function handleEvmLog(
+  block: SubstrateBlock,
+  extrinsic: SubstrateExtrinsic,
+  event: EventRecord,
+  extrinsicId: string,
+  idx: number,
+): EvmLog {
+  const { event: { data: [log] } } = event;
+  const { address, topics, data } = log.toJSON() as any;
 
-export * from "./frontier-evm-handlers";
+  let newEvmLog = new EvmLog(`${block.block.header.number.toString()}-${idx}`);
+  newEvmLog.address = address.toString();
+  newEvmLog.topics = JSON.stringify(topics);
+  newEvmLog.data = data.toString();
+  newEvmLog.timestamp = block.timestamp;
+  newEvmLog.extrinsicId = extrinsicId;
+
+  return newEvmLog;
+}
+
+
+// export * from "./frontier-evm-handlers";
+[{ "address": "0xc01ee7f10ea4af4673cfff62710e1d7792aba8f3", "topics": ["0x2b0897567fc87cf7b4d2a9277d1b7aa123979fdfab9eb3af6ae3819eb76782df", "0x000000000000000000000000f24ff3a9cf04c71dbc94d0b566f7a27b94566cac", "0x000000000000000000000000970951a12f975e6762482aca81e57d5a2a4e73f4", "0x0000000000000000000000000000000000000000000000000000000000002710"], "data": "0x000000000000000000000000c01ee7f10ea4af4673cfff62710e1d7792aba8f300000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001" }]

@@ -78,59 +78,12 @@ type SystemTokenTransfer @entity {
   extrinsic: Extrinsic
 }
 
-type Sopometa721nftApproval @entity {
+type EvmLog @entity {
   id: ID!
-  contractAddress: String! @index
-  owner: String @index
-  approved: String @index
-  tokenId: BigInt @index
-}
 
-type Sopometa721nftApprovalForAll @entity {
-  id: ID!
-  contractAddress: String! @index
-  owner: String @index
-  operator: String @index
-  approved: Boolean
-}
-
-type Sopometa721nftTransfer @entity {
-  id: ID!
-  contractAddress: String! @index
-  from: String @index
-  to: String @index
-  tokenId: BigInt @index
-}
-
-type SopometaMarketApprovalForAll @entity {
-  id: ID!
-  contractAddress: String! @index
-  account: String @index
-  operator: String @index
-  approved: Boolean
-}
-
-type SopometaMarketTransferBatch @entity {
-  id: ID!
-  contractAddress: String! @index
-  operator: String @index
-  from: String @index
-  to: String @index
-  ids: [BigInt]
-  values: [BigInt]
-}
-
-type SopometaMarketTransferSingle @entity {
-  id: ID!
-  contractAddress: String! @index
-  operator: String @index
-  from: String @index
-  to: String @index
-  value: BigInt
-}
-
-type SopometaMarketURI @entity {
-  id: ID!
-  contractAddress: String!
-  value: String
+  address: String @index
+  topics: String
+  data: String
+  timestamp: Date @index
+  extrinsic: Extrinsic
 }
