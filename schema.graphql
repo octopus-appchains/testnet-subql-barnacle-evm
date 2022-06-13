@@ -82,7 +82,7 @@ type EvmLog @entity {
   id: ID!
 
   address: String @index
-  topics: String
+  topics: [String]
   data: String
   timestamp: Date @index
   extrinsic: Extrinsic

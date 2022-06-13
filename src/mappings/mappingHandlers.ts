@@ -239,9 +239,9 @@ function handleEvmLog(
   const { address, topics, data } = log.toJSON() as any;
 
   let newEvmLog = new EvmLog(`${block.block.header.number.toString()}-${idx}`);
-  newEvmLog.address = address.toString();
-  newEvmLog.topics = JSON.stringify(topics);
-  newEvmLog.data = data.toString();
+  newEvmLog.address = address;
+  newEvmLog.topics = topics;
+  newEvmLog.data = data;
   newEvmLog.timestamp = block.timestamp;
   newEvmLog.extrinsicId = extrinsicId;
 
