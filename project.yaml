@@ -1,5 +1,5 @@
 specVersion: 0.2.0
-name: testnet-subql-barnacle-evm
+name: testnet-subql-barnacle-evm2
 version: 0.0.4
 description: This SubQuery project can be use as a st...
 repository: https://github.com/octopus-appchains/testnet-subql-barnacle-evm.git
@@ -8,7 +8,7 @@ schema:
 network:
   endpoint: >-
     wss://gateway.testnet.octopus.network/barnacle-evm/wj1hhcverunusc35jifki19otd4od1n5
-  genesisHash: "0xbd46443c4c65faf52b5f61b480e6dc693adffd498bd91d93c05e9d797fd61216"
+  genesisHash: "0x0a7a2ae1404925997c9f8d4076048201148240f171d7a14a7d6578b9d46b762d"
   dictionary: https://api.subquery.network/sq/subquery/moonbeam-dictionary
   chaintypes:
     file: ./dist/chaintypes.js

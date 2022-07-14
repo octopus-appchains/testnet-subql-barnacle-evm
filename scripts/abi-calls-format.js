@@ -33,7 +33,7 @@ const tsTypeMap = {
 
 let typeSuffix = "";
 function typeName(name) {
-  return `${typeSuffix}${name.slice(0, 1).toUpperCase() + name.slice(1)}Event`;
+  return `${typeSuffix}${name.slice(0, 1).toUpperCase() + name.slice(1)}Call`;
 }
 
 function start() {
@@ -47,24 +47,29 @@ function start() {
 
   const abiJson = fs.readFileSync(fileName);
   const abi = JSON.parse(abiJson);
-  const events = abi.filter((item) => item.type === "event");
-  const imports = events.map(({ name }) => typeName(name));
+  const functions = abi.filter(
+    (item) => item.type === "function" && item.stateMutability !== "view"
+  );
 
-  const handlers = events.map(
-    ({ name, inputs }) => `
-type ${typeName(name)}Args = [${inputs
-      .map((i) => tsTypeMap[i.type])
-      .join(", ")}] & { ${inputs
-      .map((i) => `${i.name}: ${tsTypeMap[i.type]}`)
-      .join("; ")}; };
-export async function handle${typeName(
+  const imports = functions.map(({ name }) => typeName(name));
+
+  const handlers = functions.map(({ name, inputs }) => {
+    const typeLine =
+      inputs.length > 0
+        ? `type ${typeName(name)}Args = [${inputs
+            .map((i) => tsTypeMap[i.type])
+            .join(", ")}] & { ${inputs
+            .map((i) => `${i.name}: ${tsTypeMap[i.type]}`)
+            .join("; ")}; };`
+        : "";
+    return `
+${typeLine}
+export async function handle${typeName(name)}(event: FrontierEvmCall<${typeName(
       name
-    )}(event: FrontierEvmEvent<${typeName(name)}Args>): Promise<void> {
-  const data = new ${typeName(
-    name
-  )}(event.transactionHash + "-" + event.logIndex);
-
-  data.contractAddress = event.address;
+    )}Args>): Promise<void> {
+  const data = new ${typeName(name)}(event.hash);
+  data.caller = event.from
+  data.contractAddress = event.to;
 
   ${inputs
     .map(
@@ -78,36 +83,38 @@ export async function handle${typeName(
         };`
     )
     .join(`\n  `)}
+  data.success = event.success
 
   await data.save();
 }
-      `
-  );
+      `;
+  });
   console.log(
     "======imports======\n",
     `import { ${imports.join(", ")} } from "../../types"`
   );
   console.log("======handlers======\n", handlers.join("\n"));
 
-  const projectYaml = events.map(
+  const projectYaml = functions.map(
     ({ name, inputs }) => `
     - handler: handle${typeName(name)}
-      kind: substrate/FrontierEvmEvent
+      kind: substrate/FrontierEvmCall
       filter:
-        topics:
-          - ${name}(${inputs
+        function: ${name}(${inputs
       .map((i) => `${i.type}${i.indexed ? " indexed" : ""} ${i.name}`)
       .join(", ")})
       `
   );
   console.log("======project.yaml======\n", projectYaml.join("\n"));
 
-  const graphqlSchema = events.map(
+  const graphqlSchema = functions.map(
     ({ name, inputs }) => `
 type ${typeName(name)} @entity {
   id: ID!
+  caller: String!
   contractAddress: String!
   ${inputs.map((i) => `${i.name}: ${graphTypeMap[i.type]}`).join("\n  ")}
+  success: Boolean!
 }`
   );
   console.log("======schema.graphql======\n", graphqlSchema.join("\n"));
