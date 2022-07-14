@@ -24,11 +24,11 @@ const tsTypeMap = {
   address: "string",
   bool: "boolean",
   bytes: "string",
-  "string[]": "[]string",
-  "uint256[]": "[]BigNumber",
-  "uint32[]": "[]number",
-  "address[]": "[]string",
-  "bool[]": "[]boolean",
+  "string[]": "string[]",
+  "uint256[]": "BigNumber[]",
+  "uint32[]": "number[]",
+  "address[]": "string[]",
+  "bool[]": "boolean[]",
 };
 
 let typeSuffix = "";
@@ -62,11 +62,12 @@ function start() {
             .map((i) => `${i.name}: ${tsTypeMap[i.type]}`)
             .join("; ")}; };`
         : "";
+    const typeInner = inputs.length > 0 ? `<${typeName(name)}Args>` : "";
     return `
 ${typeLine}
-export async function handle${typeName(name)}(event: FrontierEvmCall<${typeName(
+export async function handle${typeName(
       name
-    )}Args>): Promise<void> {
+    )}(event: FrontierEvmCall${typeInner}): Promise<void> {
   const data = new ${typeName(name)}(event.hash);
   data.caller = event.from
   data.contractAddress = event.to;
@@ -93,7 +94,7 @@ export async function handle${typeName(name)}(event: FrontierEvmCall<${typeName(
     "======imports======\n",
     `import { ${imports.join(", ")} } from "../../types"`
   );
-  console.log("======handlers======\n", handlers.join("\n"));
+  console.log("======handlers======\n", handlers.join(""));
 
   const projectYaml = functions.map(
     ({ name, inputs }) => `
@@ -102,10 +103,9 @@ export async function handle${typeName(name)}(event: FrontierEvmCall<${typeName(
       filter:
         function: ${name}(${inputs
       .map((i) => `${i.type}${i.indexed ? " indexed" : ""} ${i.name}`)
-      .join(", ")})
-      `
+      .join(", ")})`
   );
-  console.log("======project.yaml======\n", projectYaml.join("\n"));
+  console.log("======project.yaml======\n", projectYaml.join(""));
 
   const graphqlSchema = functions.map(
     ({ name, inputs }) => `

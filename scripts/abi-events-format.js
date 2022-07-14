@@ -24,11 +24,11 @@ const tsTypeMap = {
   address: "string",
   bool: "boolean",
   bytes: "string",
-  "string[]": "[]string",
-  "uint256[]": "[]BigNumber",
-  "uint32[]": "[]number",
-  "address[]": "[]string",
-  "bool[]": "[]boolean",
+  "string[]": "string[]",
+  "uint256[]": "BigNumber[]",
+  "uint32[]": "number[]",
+  "address[]": "string[]",
+  "bool[]": "boolean[]",
 };
 
 let typeSuffix = "";
@@ -87,7 +87,7 @@ export async function handle${typeName(
     "======imports======\n",
     `import { ${imports.join(", ")} } from "../../types"`
   );
-  console.log("======handlers======\n", handlers.join("\n"));
+  console.log("======handlers======\n", handlers.join(""));
 
   const projectYaml = events.map(
     ({ name, inputs }) => `
@@ -97,8 +97,7 @@ export async function handle${typeName(
         topics:
           - ${name}(${inputs
       .map((i) => `${i.type}${i.indexed ? " indexed" : ""} ${i.name}`)
-      .join(", ")})
-      `
+      .join(", ")})`
   );
   console.log("======project.yaml======\n", projectYaml.join("\n"));
 

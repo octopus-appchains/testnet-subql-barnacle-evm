@@ -1,5 +1,5 @@
 specVersion: 0.2.0
-name: testnet-subql-barnacle-evm2
+name: testnet-subql-barnacle-evm
 version: 0.0.4
 description: This SubQuery project can be use as a st...
 repository: https://github.com/octopus-appchains/testnet-subql-barnacle-evm.git
@@ -20,3 +20,90 @@ dataSources:
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
+  - kind: substrate/FrontierEvm
+    startBlock: 752073
+    processor:
+      file: "./node_modules/@subql/contract-processors/dist/frontierEvm.js"
+      options:
+        # Must be a key of assets
+        abi: gameItems
+        ## The contract that emitted the event
+        address: "0x5e2eC598f3f3Fc4dCec7c1d12A46045fF0505A29"
+    assets:
+      gameItems:
+        file: "./gameItems.abi.json"
+    mapping:
+      file: "./dist/index.js"
+      handlers:
+        - handler: handleGameItemsApproveCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: approve(address to, uint256 tokenId)
+        - handler: handleGameItemsDevClaimCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: devClaim(address to, uint256 quantity, string[] ipfsHash)
+        - handler: handleGameItemsRenounceOwnershipCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: renounceOwnership()
+        - handler: handleGameItemsSafeTransferFromCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: safeTransferFrom(address from, address to, uint256 tokenId, bytes _data)
+        - handler: handleGameItemsSetApprovalForAllCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: setApprovalForAll(address operator, bool approved)
+        - handler: handleGameItemsSetKeyCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: setKey(address signer)
+        - handler: handleGameItemsTransferFromCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: transferFrom(address from, address to, uint256 tokenId)
+        - handler: handleGameItemsSetBaseURICall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: setBaseURI(string baseURI)
+        - handler: handleGameItemsSetNameAndSymbolCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: setNameAndSymbol(string _newName, string _newSymbol)
+        - handler: handleGameItemsTransferLowerOwnershipCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: transferLowerOwnership(address newOwner)
+        - handler: handleGameItemsTransferOwnershipCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: transferOwnership(address newOwner)
+        - handler: handleGameItemsTransferRealOwnershipCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: transferRealOwnership(address newRealOwner)
+        - handler: handleGameItemsUpdateMetadataCall
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: updateMetadata(uint256 tokenId, string ipfsHash, bytes signature)
+        - handler: handleGameItemsApprovalEvent
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
+        - handler: handleGameItemsApprovalForAllEvent
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - ApprovalForAll(address indexed owner, address indexed operator, bool approved)
+        - handler: handleGameItemsOwnershipTransferredEvent
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+        - handler: handleGameItemsTransferEvent
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
