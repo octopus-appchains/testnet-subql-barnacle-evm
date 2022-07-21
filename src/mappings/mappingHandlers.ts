@@ -98,7 +98,7 @@ function handleExtrinsic(
   newSystemTokenTransfers.forEach(t => accountIds.push(t.fromId, t.toId));
 
   const accounts: Account[] = accountIds.map((aId) => {
-    const account = new Account(aId);
+    const account = new Account(aId.toLowerCase());
     account.timestamp = block.timestamp;
     return account;
   });
