@@ -70,7 +70,7 @@ function handleExtrinsic(
   newExtrinsic.method = extrinsic.extrinsic.method.method;
   newExtrinsic.section = extrinsic.extrinsic.method.section;
   newExtrinsic.args = extrinsic.extrinsic.args?.toString();
-  newExtrinsic.signerId = extrinsic.extrinsic.signer?.toString();
+  newExtrinsic.signerId = extrinsic.extrinsic.signer?.toString().toLocaleLowerCase();
   newExtrinsic.nonce = BigInt(extrinsic.extrinsic.nonce.toString()) || BigInt(0);
   newExtrinsic.timestamp = block.timestamp;
   newExtrinsic.signature = extrinsic.extrinsic.signature.toString();
@@ -130,7 +130,7 @@ function handleCalls(
     newCall.timestamp = extrinsic.timestamp
     newCall.isSuccess = depth === 0 ? extrinsic.isSuccess : getBatchInterruptedIndex(substrateExtrinsic) > idx;
 
-    newCall.signerId = substrateExtrinsic.extrinsic.signer.toString();
+    newCall.signerId = substrateExtrinsic.extrinsic.signer.toString().toLocaleLowerCase();
 
     if (!isRoot) {
       newCall.parentCallId = isRoot ? '' : parentCallId
@@ -177,8 +177,8 @@ function handleSystemTokenTransfer(
   idx: number,
 ): SystemTokenTransfer {
   const { event: { data: [from_origin, to_origin, amount_origin] } } = event;
-  const from = (from_origin as AccountId).toString();
-  const to = (to_origin as AccountId).toString();
+  const from = (from_origin as AccountId).toString().toLocaleLowerCase();
+  const to = (to_origin as AccountId).toString().toLocaleLowerCase();
   const amount = (amount_origin as Balance).toBigInt();
 
   let newSystemTokenTransfer = new SystemTokenTransfer(`${block.block.header.number.toString()}-${idx}`);
@@ -239,7 +239,7 @@ function handleEvmLog(
   const { address, topics, data } = log.toJSON() as any;
 
   let newEvmLog = new EvmLog(`${block.block.header.number.toString()}-${idx}`);
-  newEvmLog.address = address;
+  newEvmLog.address = address.toLocaleLowerCase();
   newEvmLog.topics = topics;
   newEvmLog.data = data;
   newEvmLog.timestamp = block.timestamp;
