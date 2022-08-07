@@ -13,7 +13,7 @@ type Block @entity {
 type Extrinsic @entity {
   id: ID!
 
-  hash: String!
+  hash: String! @index
   method: String @index
   section: String @index
   args: String
@@ -59,13 +59,20 @@ type Call @entity {
 
 type Account @entity {
   id: ID!
-  timestamp: Date!
+  nonce: Int
+  freeBalance: BigInt
+  reservedBalance: BigInt
+  miscFrozenBalance: BigInt
+  feeFrozenBalance: BigInt
+  isContract: Boolean
+  creator: Account
+  createdAt: Date @index
 
   extrinsics: [Extrinsic] @derivedFrom(field: "signer")
-  calls: [Call] @derivedFrom(field: "signer")
-
   transferIn: [SystemTokenTransfer] @derivedFrom(field: "to")
   transferOut: [SystemTokenTransfer] @derivedFrom(field: "from")
+  transactionIn: [Transaction] @derivedFrom(field: "to")
+  transactionOut: [Transaction] @derivedFrom(field: "from")
 }
 
 type SystemTokenTransfer @entity {
@@ -80,10 +87,31 @@ type SystemTokenTransfer @entity {
 
 type EvmLog @entity {
   id: ID!
-
-  address: String @index
-  topics: [String]
+  transaction: Transaction
+  logIndex: Int
+  address: String
   data: String
-  timestamp: Date @index
+  topics: [String]
+  timestamp: Date
+}
+
+type Transaction @entity {
+  id: ID!
+  transactionHash: String
+  from: Account
+  to: Account
+  isSuccess: Boolean
+  value: BigInt
+  nonce: Int
+  gasLimit: BigInt
+  maxFeePerGas: BigInt
+  maxPriorityFeePerGas: BigInt
+  gasUsed: BigInt
+  inputData: String
+  exitReason: String
+  timestamp: Date
+
+  block: Block
   extrinsic: Extrinsic
+  logs: [EvmLog] @derivedFrom(field: "transaction")
 }

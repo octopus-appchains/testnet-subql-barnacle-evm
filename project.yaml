@@ -20,6 +20,7 @@ dataSources:
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
+
   # - kind: substrate/FrontierEvm
   #   startBlock: 1
   #   processor:
