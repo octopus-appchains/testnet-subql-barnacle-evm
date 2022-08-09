@@ -69,8 +69,10 @@ type Account @entity {
   createdAt: Date @index
 
   extrinsics: [Extrinsic] @derivedFrom(field: "signer")
+  calls: [Call] @derivedFrom(field: "signer")
   transferIn: [SystemTokenTransfer] @derivedFrom(field: "to")
   transferOut: [SystemTokenTransfer] @derivedFrom(field: "from")
+
   transactionIn: [Transaction] @derivedFrom(field: "to")
   transactionOut: [Transaction] @derivedFrom(field: "from")
 }
