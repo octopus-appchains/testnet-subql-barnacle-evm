@@ -1,9 +1,9 @@
-import { Account } from "../types";
+import { Account, Block } from "../types";
 import { isEqual } from "lodash";
 import { getAccount, getAccountCode } from './moonbeam-handlers/utils/api';
 
-export async function handleAccount({ accountId, createdAt, creatorId }:
-  { accountId: string, createdAt: Date, creatorId?: string }): Promise<Account> {
+export async function handleAccount({ accountId, block, creatorId }:
+  { accountId: string, block: Block, creatorId?: string }): Promise<Account> {
   const address = accountId.toLowerCase();
   const {
     nonce,
@@ -22,13 +22,13 @@ export async function handleAccount({ accountId, createdAt, creatorId }:
     reservedBalance: reserved.toBigInt(),
     miscFrozenBalance: miscFrozen.toBigInt(),
     feeFrozenBalance: feeFrozen.toBigInt(),
-    createdAt,
+    createdAt: block.timestamp,
     isContract: acccoutCode.length > 0,
     creatorId: acccoutCode.length > 0 ? creatorId : null
   });
 }
 
-export async function tryUpdateAccount(account: Account) {
+export async function tryUpdateAccount(account: Account, block: Block) {
   const prevAccount = { ...account };
   const {
     nonce,

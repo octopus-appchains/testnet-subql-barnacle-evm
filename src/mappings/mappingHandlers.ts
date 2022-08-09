@@ -1,3 +1,4 @@
+import _ from "lodash";
 import type { Vec, u32 } from '@polkadot/types'
 import { EventRecord, DispatchError } from "@polkadot/types/interfaces";
 import { AccountId, Balance } from '@polkadot/types/interfaces/runtime';
@@ -10,11 +11,12 @@ import { IEvent } from '@polkadot/types/types'
 import { CreatorIdMap } from './moonbeam-handlers/utils/types';
 import { handleExtrinsic, wrapExtrinsics } from './extrinsics';
 import { handleAccount } from './accounts';
-
-import _ from "lodash";
+import { getBaseFee } from './moonbeam-handlers/utils/api';
+import { setBaseFeeSync } from "./moonbeam-handlers/transactions";
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
   logger.debug("handleBlock===========");
+  setBaseFeeSync(await getBaseFee());
   const newBlock = new Block(block.block.header.hash.toString())
   newBlock.number = block.block.header.number.toBigInt() || BigInt(0);
   newBlock.timestamp = block.timestamp;
@@ -50,9 +52,9 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
   await Promise.all(Object.keys(creatorIdMap).map(async accountId => {
     const existedAccount = await Account.get(accountId);
     if (existedAccount) {
-      await tryUpdateAccount(existedAccount);
+      await tryUpdateAccount(existedAccount, newBlock);
     } else {
-      const handledAccount: Account = await handleAccount({ accountId, createdAt: block.timestamp, creatorId: creatorIdMap[accountId] });
+      const handledAccount: Account = await handleAccount({ accountId, block: newBlock, creatorId: creatorIdMap[accountId] });
       newAccounts.push(handledAccount);
     }
   }));
