@@ -96,7 +96,7 @@ export function handleExtrinsic(
           };
         }
       } else if (evt.event.section === "system" && evt.event.method === "ExtrinsicSuccess") {
-        const extrinsicSuccessEvtDataObj = evt.event.data.toJSON() as any;
+        const extrinsicSuccessEvtDataObj = evt.event.data.toHuman() as any;
         extrinsicSuccessDispatchInfo = extrinsicSuccessEvtDataObj.dispatchInfo;
       }
     });
