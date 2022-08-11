@@ -73,6 +73,7 @@ type Account @entity {
   transferIn: [SystemTokenTransfer] @derivedFrom(field: "to")
   transferOut: [SystemTokenTransfer] @derivedFrom(field: "from")
 
+  evmLogs: [EvmLog] @derivedFrom(field: "contract")
   transactionIn: [Transaction] @derivedFrom(field: "to")
   transactionOut: [Transaction] @derivedFrom(field: "from")
 }
@@ -89,12 +90,12 @@ type SystemTokenTransfer @entity {
 
 type EvmLog @entity {
   id: ID!
-  transaction: Transaction
+  transaction: Transaction @index
   logIndex: Int
-  address: String
+  contract: Account @index
   data: String
   topics: [String]
-  timestamp: Date
+  timestamp: Date @index
 }
 
 type Transaction @entity {
