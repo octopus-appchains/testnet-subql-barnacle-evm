@@ -14,7 +14,7 @@ export function handleEvmLogs(
     let newEvmLog = new EvmLog(`${block.block.header.number.toString()}-${startEvtIdx + idx}`);
     newEvmLog.transactionId = ethTransactData.txHash;
     newEvmLog.logIndex = idx;
-    newEvmLog.address = address.toLocaleLowerCase();
+    newEvmLog.contractId = address.toLocaleLowerCase();
     newEvmLog.data = data;
     newEvmLog.topics = topics;
     newEvmLog.timestamp = block.timestamp;
