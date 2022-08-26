@@ -67,6 +67,9 @@ type Account @entity {
   isContract: Boolean @index
   creator: Account @index
   createdAt: Date @index
+  erc20TokenContract: Erc20TokenContract
+  erc721TokenContract: Erc721TokenContract
+  erc1155TokenContract: Erc1155TokenContract
 
   extrinsics: [Extrinsic] @derivedFrom(field: "signer")
   calls: [Call] @derivedFrom(field: "signer")
@@ -142,7 +145,6 @@ type Erc20TokenContract @entity {
   id: ID!
   symbol: String
   name: String
-  contract: Account @index
   decimals: Int
   totalSupply: BigInt
 
@@ -171,7 +173,6 @@ type Erc721TokenContract @entity {
   id: ID!
   symbol: String
   name: String
-  contract: Account @index
 
   tokens: [Erc721Token] @derivedFrom(field: "tokenContract")
   balances: [Erc721Balance] @derivedFrom(field: "tokenContract")
@@ -207,7 +208,6 @@ type Erc721Transfer @entity {
 
 type Erc1155TokenContract @entity {
   id: ID!
-  contract: Account @index
 
   tokens: [Erc1155Token] @derivedFrom(field: "tokenContract")
   balances: [Erc1155Balance] @derivedFrom(field: "tokenContract")

@@ -131,6 +131,12 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
     existsErc1155Balances,
   ])
 
+  await setContractToAccountBatch([
+    { erc20TokenContract: newErc20TokenContracts },
+    { erc721TokenContract: newErc721TokenContracts },
+    { erc1155TokenContract: newErc1155TokenContracts }
+  ])
+
 }
 
 async function updateStates(statesArr: any[]) {
@@ -139,5 +145,17 @@ async function updateStates(statesArr: any[]) {
       const erc20Token = states[index];
       await erc20Token.save();
     }
+  }));
+}
+
+async function setContractToAccountBatch(newContractsWraps: any[]) {
+  await Promise.all(newContractsWraps.map(async (contractsWrap: any) => {
+    const key = Object.keys(contractsWrap)[0];
+    const contracts = contractsWrap[key];
+    await Promise.all(contracts.map(async (contract) => {
+      const account = await Account.get(contract.id);
+      account[`${key}Id`] = contract.id;
+      await account.save();
+    }))
   }));
 }

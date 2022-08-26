@@ -105,7 +105,6 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           if (!erc20TokenContract) {
             // const { name, symbol } = await getErc20Info(contractId);
             const newErc20TokenContract = new Erc20TokenContract(contractId);
-            newErc20TokenContract.contractId = contractId;
             newErc20TokenContract.totalSupply = value;
             // newErc20TokenContract.name = name;
             // newErc20TokenContract.symbol = symbol;
@@ -170,7 +169,6 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           if (!erc721TokenContract) {
             // const { name, symbol } = await getErc721Info(contractId);
             const newErc721TokenContract = new Erc721TokenContract(contractId);
-            newErc721TokenContract.contractId = contractId;
             // newErc721TokenContract.name = name;
             // newErc721TokenContract.symbol = symbol;
             newErc721TokenContracts.push(newErc721TokenContract);
@@ -262,7 +260,6 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           const erc1155TokenContract = await Erc1155TokenContract.get(contractId) || newErc1155TokenContracts.find(tk => tk.id === contractId);
           if (!erc1155TokenContract) {
             const newErc1155TokenContract = new Erc1155TokenContract(contractId);
-            newErc1155TokenContract.contractId = contractId;
             newErc1155TokenContracts.push(newErc1155TokenContract);
           }
           const erc1155TokenId = `${contractId}-${tokenId.toString()}`;
