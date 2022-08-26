@@ -13,7 +13,7 @@ export function handleEvmLogs(
     const { address, topics, data } = log.toJSON() as any;
     let newEvmLog = new EvmLog(`${block.block.header.number.toString()}-${startEvtIdx + idx}`);
     newEvmLog.transactionId = ethTransactData.txHash;
-    newEvmLog.logIndex = idx;
+    newEvmLog.logIndex = startEvtIdx + idx;
     newEvmLog.contractId = address.toLocaleLowerCase();
     newEvmLog.data = data;
     newEvmLog.topics = topics;

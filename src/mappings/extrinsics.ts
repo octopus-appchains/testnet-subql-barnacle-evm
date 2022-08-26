@@ -1,12 +1,22 @@
 import { SubstrateExtrinsic, SubstrateBlock } from "@subql/types";
 import { EventRecord } from "@polkadot/types/interfaces";
-import { Event, Extrinsic, Call, SystemTokenTransfer, Transaction, EvmLog } from "../types";
+import {
+  Event,
+  Extrinsic,
+  Call,
+  SystemTokenTransfer,
+  Transaction,
+  EvmLog,
+  Erc20Transfer,
+  Erc20TokenContract
+} from "../types";
 import { CreatorIdMap } from './moonbeam-handlers/utils/types';
 import { handleCalls } from './calls';
 import { handleSystemTokenTransfer } from './systemTokenTransfer';
 import { handleEvent } from './event';
 import { handleTransaction } from "./moonbeam-handlers/transactions";
 import { handleEvmLogs } from "./moonbeam-handlers/evmLogs";
+import { handleTokenTransfers } from "./moonbeam-handlers/tokens";
 import _ from "lodash";
 
 export function wrapExtrinsics(wrappedBlock: SubstrateBlock): SubstrateExtrinsic[] {
@@ -25,20 +35,23 @@ export function wrapExtrinsics(wrappedBlock: SubstrateBlock): SubstrateExtrinsic
   });
 }
 
-export function handleExtrinsic(
+export async function handleExtrinsic(
   block: SubstrateBlock,
   extrinsic: SubstrateExtrinsic,
   idx: number,
   startEvtIdx: number,
-): {
+): Promise<{
   newExtrinsic: Extrinsic,
   newCalls: Call[],
   newEvents: Event[],
   newSystemTokenTransfers: SystemTokenTransfer[],
   newEvmLogs: EvmLog[],
   creatorIdMap: CreatorIdMap,
-  newTransactions: Transaction[]
-} {
+  newTransactions: Transaction[],
+  newErc20Transfers: Erc20Transfer[],
+  newErc20TokenContracts: Erc20TokenContract[],
+  existsErc20TokenContracts: Erc20TokenContract[]
+}> {
   const extrinsicId = `${block.block.header.number}-${idx}`;
   const newExtrinsic = new Extrinsic(extrinsicId);
   newExtrinsic.hash = extrinsic.extrinsic.hash.toString();
@@ -106,9 +119,83 @@ export function handleExtrinsic(
     creatorIdMap[t.toId] = null;
   });
 
-  if (ethTransactData) {
-    newTransactions.push(handleTransaction(newExtrinsic, ethTransactData, extrinsicSuccessDispatchInfo));
-    newEvmLogs = handleEvmLogs(block, logEvts, ethTransactData, startEvtIdx);
+  const result = {
+    newExtrinsic,
+    newCalls,
+    newEvents,
+    newSystemTokenTransfers,
+    creatorIdMap,
+    newEvmLogs,
+    newTransactions,
+    newErc20Transfers: [],
+    newErc20Balances: [],
+    existsErc20Balances: [],
+    newErc20TokenContracts: [],
+    existsErc20TokenContracts: [],
+    newErc721Transfers: [],
+    newErc721Balances: [],
+    existsErc721Balances: [],
+    newErc721TokenContracts: [],
+    newErc721Tokens: [],
+    newErc1155Transfers: [],
+    newErc1155Balances: [],
+    existsErc1155Balances: [],
+    newErc1155TokenContracts: [],
+    newErc1155Tokens: [],
+    existsErc1155Tokens: [],
   }
-  return { newExtrinsic, newCalls, newEvents, newSystemTokenTransfers, creatorIdMap, newEvmLogs, newTransactions };
+
+  if (ethTransactData) {
+    const newTransaction = handleTransaction(newExtrinsic, ethTransactData, extrinsicSuccessDispatchInfo);
+    newTransactions.push(newTransaction);
+    newEvmLogs = handleEvmLogs(block, logEvts, ethTransactData, startEvtIdx);
+    const {
+      accountIds,
+      newErc20Transfers,
+      newErc20Balances,
+      existsErc20Balances,
+      newErc20TokenContracts,
+      existsErc20TokenContracts,
+
+      newErc721Transfers,
+      newErc721Balances,
+      existsErc721Balances,
+      newErc721TokenContracts,
+      newErc721Tokens,
+
+      newErc1155Transfers,
+      newErc1155Balances,
+      existsErc1155Balances,
+      newErc1155TokenContracts,
+      newErc1155Tokens,
+      existsErc1155Tokens
+    } = await handleTokenTransfers(newEvmLogs, newTransaction.id, block.timestamp);
+
+    Object.assign(result, {
+      accountIds,
+      newErc20Transfers,
+      newErc20Balances,
+      existsErc20Balances,
+      newErc20TokenContracts,
+      existsErc20TokenContracts,
+
+      newErc721Transfers,
+      newErc721Balances,
+      existsErc721Balances,
+      newErc721TokenContracts,
+      newErc721Tokens,
+
+      newErc1155Transfers,
+      newErc1155Balances,
+      existsErc1155Balances,
+      newErc1155TokenContracts,
+      newErc1155Tokens,
+      existsErc1155Tokens
+    });
+    accountIds.forEach(ac => {
+      creatorIdMap[ac] = creatorIdMap[ac] ? creatorIdMap[ac] : null
+    })
+  }
+
+  return result;
 }

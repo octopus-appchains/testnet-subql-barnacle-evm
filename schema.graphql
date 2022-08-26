@@ -59,13 +59,13 @@ type Call @entity {
 
 type Account @entity {
   id: ID!
-  nonce: Int
+  nonce: Int @index
   freeBalance: BigInt
   reservedBalance: BigInt
   miscFrozenBalance: BigInt
   feeFrozenBalance: BigInt
-  isContract: Boolean
-  creator: Account
+  isContract: Boolean @index
+  creator: Account @index
   createdAt: Date @index
 
   extrinsics: [Extrinsic] @derivedFrom(field: "signer")
@@ -76,6 +76,10 @@ type Account @entity {
   evmLogs: [EvmLog] @derivedFrom(field: "contract")
   transactionIn: [Transaction] @derivedFrom(field: "to")
   transactionOut: [Transaction] @derivedFrom(field: "from")
+
+  erc20Balances: [Erc20Balance] @derivedFrom(field: "account")
+  erc20TransferIn: [Erc20Transfer] @derivedFrom(field: "to")
+  erc20TransferOut: [Erc20Transfer] @derivedFrom(field: "from")
 }
 
 type SystemTokenTransfer @entity {
@@ -104,12 +108,16 @@ type Transaction @entity {
   from: Account
   to: Account
   isSuccess: Boolean
+  type: String
+  signature: String
   value: BigInt
   nonce: Int
   gasLimit: BigInt
+  gasPrice: BigInt
   maxFeePerGas: BigInt
   maxPriorityFeePerGas: BigInt
   gasUsed: BigInt
+  accessList: String
   inputData: String
   exitReason: String
   timestamp: Date
@@ -117,4 +125,111 @@ type Transaction @entity {
   block: Block
   extrinsic: Extrinsic
   logs: [EvmLog] @derivedFrom(field: "transaction")
+}
+
+type Erc20TokenContract @entity {
+  id: ID!
+  symbol: String
+  name: String
+  contract: Account @index
+  decimals: Int
+  totalSupply: BigInt
+
+  balances: [Erc20Balance] @derivedFrom(field: "tokenContract")
+  erc20Transfers: [Erc20Transfer] @derivedFrom(field: "tokenContract")
+}
+
+type Erc20Balance @entity {
+  id: ID!
+  account: Account @index
+  tokenContract: Erc20TokenContract @index
+  value: BigInt
+}
+
+type Erc20Transfer @entity {
+  id: ID!
+  from: Account @index
+  to: Account @index
+  tokenContract: Erc20TokenContract @index
+  value: BigInt
+  transaction: Transaction @index
+  timestamp: Date
+}
+
+type Erc721TokenContract @entity {
+  id: ID!
+  symbol: String
+  name: String
+  contract: Account @index
+
+  tokens: [Erc721Token] @derivedFrom(field: "tokenContract")
+  balances: [Erc721Balance] @derivedFrom(field: "tokenContract")
+  erc721Transfers: [Erc721Transfer] @derivedFrom(field: "tokenContract")
+}
+
+type Erc721Token @entity {
+  id: ID!
+  tokenContract: Erc721TokenContract @index
+  idInContract: BigInt @index
+  tokenURI: String
+
+  balances: [Erc721Balance] @derivedFrom(field: "token")
+  erc721Transfers: [Erc721Transfer] @derivedFrom(field: "token")
+}
+
+type Erc721Balance @entity {
+  id: ID!
+  tokenContract: Erc721TokenContract @index
+  account: Account @index
+  token: Erc721Token @index
+}
+
+type Erc721Transfer @entity {
+  id: ID!
+  from: Account @index
+  to: Account @index
+  tokenContract: Erc721TokenContract @index
+  token: Erc721Token
+  transaction: Transaction @index
+  timestamp: Date
+}
+
+type Erc1155TokenContract @entity {
+  id: ID!
+  contract: Account @index
+
+  tokens: [Erc1155Token] @derivedFrom(field: "tokenContract")
+  balances: [Erc1155Balance] @derivedFrom(field: "tokenContract")
+  erc1155Transfers: [Erc1155Transfer] @derivedFrom(field: "tokenContract")
+}
+
+type Erc1155Token @entity {
+  id: ID!
+  tokenContract: Erc1155TokenContract @index
+  uri: String
+  idInContract: BigInt @index
+  totalSupply: BigInt
+
+  balances: [Erc1155Balance] @derivedFrom(field: "token")
+  erc1155Transfers: [Erc1155Transfer] @derivedFrom(field: "token")
+}
+
+type Erc1155Balance @entity {
+  id: ID!
+  tokenContract: Erc1155TokenContract @index
+  account: Account @index
+  token: Erc1155Token @index
+  value: BigInt
+}
+
+type Erc1155Transfer @entity {
+  id: ID!
+  operator: Account @index
+  from: Account @index
+  to: Account @index
+  tokenContract: Erc1155TokenContract @index
+  token: Erc1155Token
+  value: BigInt
+  transaction: Transaction @index
+  timestamp: Date
 }

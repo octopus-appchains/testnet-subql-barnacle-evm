@@ -1,5 +1,4 @@
 import { SubstrateEvent, SubstrateExtrinsic } from "@subql/types"
-import { MoonbeamEvent } from "@subql/contract-processors/dist/moonbeam"
 import { Balance } from '@polkadot/types/interfaces'
 import type { CallBase, AnyTuple } from '@polkadot/types/types'
 
