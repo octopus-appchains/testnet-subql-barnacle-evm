@@ -80,6 +80,14 @@ type Account @entity {
   erc20Balances: [Erc20Balance] @derivedFrom(field: "account")
   erc20TransferIn: [Erc20Transfer] @derivedFrom(field: "to")
   erc20TransferOut: [Erc20Transfer] @derivedFrom(field: "from")
+
+  erc721Balances: [Erc721Balance] @derivedFrom(field: "account")
+  erc721TransferIn: [Erc721Transfer] @derivedFrom(field: "to")
+  erc721TransferOut: [Erc721Transfer] @derivedFrom(field: "from")
+
+  erc1155Balances: [Erc1155Balance] @derivedFrom(field: "account")
+  erc1155TransferIn: [Erc1155Transfer] @derivedFrom(field: "to")
+  erc1155TransferOut: [Erc1155Transfer] @derivedFrom(field: "from")
 }
 
 type SystemTokenTransfer @entity {
@@ -125,9 +133,9 @@ type Transaction @entity {
   extrinsic: Extrinsic
 
   logs: [EvmLog] @derivedFrom(field: "transaction")
-  erc20Transfers[Erc20Transfer] @derivedFrom(field: "transaction")
-  erc721Transfers[Erc721Transfer] @derivedFrom(field: "transaction")
-  erc721Transfers[Erc721Transfer] @derivedFrom(field: "transaction")
+  erc20Transfers: [Erc20Transfer] @derivedFrom(field: "transaction")
+  erc721Transfers: [Erc721Transfer] @derivedFrom(field: "transaction")
+  erc1155Transfers: [Erc1155Transfer] @derivedFrom(field: "transaction")
 }
 
 type Erc20TokenContract @entity {
