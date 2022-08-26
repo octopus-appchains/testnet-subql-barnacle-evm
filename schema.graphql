@@ -121,10 +121,13 @@ type Transaction @entity {
   inputData: String
   exitReason: String
   timestamp: Date
-
   block: Block
   extrinsic: Extrinsic
+
   logs: [EvmLog] @derivedFrom(field: "transaction")
+  erc20Transfers[Erc20Transfer] @derivedFrom(field: "transaction")
+  erc721Transfers[Erc721Transfer] @derivedFrom(field: "transaction")
+  erc721Transfers[Erc721Transfer] @derivedFrom(field: "transaction")
 }
 
 type Erc20TokenContract @entity {
