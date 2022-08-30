@@ -17,6 +17,7 @@ import {
   Erc1155Transfer,
   Erc1155Balance,
 } from "../../types";
+import { jsonLog } from "../utils";
 import { erc20Abi } from "./abi/erc20";
 // import {
 //   getErc20Info,
@@ -157,6 +158,7 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           newErc20Transfers.push(newErc20Transfer);
         } catch (error) {
           logger.warn("handle erc20 Transfer event error")
+          logger.warn(error.toString())
         }
       } else if (topics.length === 4) {
         try {
@@ -207,6 +209,7 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           newErc721Transfers.push(newErc721Transfer);
         } catch (error) {
           logger.warn("handle erc721 Transfer event error")
+          logger.warn(error.toString())
         }
       }
     } else if ([TransferSingleHex, TransferBatchHex].includes(topics[0]) && topics.length === 4) {
@@ -294,15 +297,18 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
 
           balances.forEach(({ balanceId, accountId, erc1155Balance }) => {
             if (!erc1155Balance) {
-              const newErc1155Balance = new Erc1155Balance(balanceId);
-              newErc1155Balance.tokenContractId = contractId;
-              newErc1155Balance.accountId = to;
-              newErc1155Balance.tokenId = erc1155TokenId;
-              newErc1155Balance.value = value;
-              newErc1155Balances.push(newErc1155Balance);
+              if (accountId === to) {
+                const newErc1155Balance = new Erc1155Balance(balanceId);
+                newErc1155Balance.tokenContractId = contractId;
+                newErc1155Balance.accountId = accountId;
+                newErc1155Balance.tokenId = erc1155TokenId;
+                newErc1155Balance.value = value;
+                newErc1155Balances.push(newErc1155Balance);
+              }
             } else {
               if (from === accountId) {
                 erc1155Balance.value -= value;
+                erc1155Balance.value = erc1155Balance.value < BigInt(0) ? BigInt(0) : erc1155Balance.value;
               } else if (to === accountId) {
                 erc1155Balance.value += value;
               }
@@ -323,6 +329,7 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
         }))
       } catch (error) {
         logger.warn("handle erc1155 Transfer event error")
+        logger.warn(error.toString())
       }
     }
   }));
