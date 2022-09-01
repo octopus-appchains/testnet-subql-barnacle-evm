@@ -1,4 +1,6 @@
 import { SubstrateExtrinsic, SubstrateBlock } from "@subql/types";
+import { WrappedExtrinsic } from "./types";
+import { GenericExtrinsic } from '@polkadot/types/extrinsic';
 import { EventRecord } from "@polkadot/types/interfaces";
 import {
   Event,
@@ -18,8 +20,9 @@ import { handleTransaction } from "./moonbeam-handlers/transactions";
 import { handleEvmLogs } from "./moonbeam-handlers/evmLogs";
 import { handleTokenTransfers } from "./moonbeam-handlers/tokens";
 import _ from "lodash";
+import { jsonLog } from "./utils";
 
-export function wrapExtrinsics(wrappedBlock: SubstrateBlock): SubstrateExtrinsic[] {
+export function wrapExtrinsics(wrappedBlock: SubstrateBlock): WrappedExtrinsic[] {
   return wrappedBlock.block.extrinsics.map((extrinsic, idx) => {
     const events = wrappedBlock.events.filter(
       ({ phase }) => phase.isApplyExtrinsic && phase.asApplyExtrinsic.eqn(idx)
@@ -37,7 +40,7 @@ export function wrapExtrinsics(wrappedBlock: SubstrateBlock): SubstrateExtrinsic
 
 export async function handleExtrinsic(
   block: SubstrateBlock,
-  extrinsic: SubstrateExtrinsic,
+  extrinsic: WrappedExtrinsic,
   idx: number,
   startEvtIdx: number,
 ): Promise<{
@@ -125,7 +128,7 @@ export async function handleExtrinsic(
     newEvents,
     newSystemTokenTransfers,
     creatorIdMap,
-    newEvmLogs,
+    newEvmLogs: [],
     newTransactions,
     newErc20Transfers: [],
     newErc20Balances: [],
@@ -173,6 +176,7 @@ export async function handleExtrinsic(
 
     Object.assign(result, {
       accountIds,
+      newEvmLogs,
       newErc20Transfers,
       newErc20Balances,
       existsErc20Balances,

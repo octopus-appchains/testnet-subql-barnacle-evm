@@ -1,12 +1,13 @@
 import { EventRecord } from "@polkadot/types/interfaces";
 import { SubstrateExtrinsic, SubstrateBlock } from "@subql/types";
+import { WrappedExtrinsic } from "./types";
 import { Event } from "../types";
 import _ from "lodash";
 
 
 export function handleEvent(
   block: SubstrateBlock,
-  extrinsic: SubstrateExtrinsic,
+  extrinsic: WrappedExtrinsic,
   event: EventRecord,
   extrinsicId: string,
   idx: number,

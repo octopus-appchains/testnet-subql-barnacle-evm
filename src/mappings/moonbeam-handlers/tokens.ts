@@ -19,12 +19,12 @@ import {
 } from "../../types";
 import { jsonLog } from "../utils";
 import { erc20Abi } from "./abi/erc20";
-// import {
-//   getErc20Info,
-//   getErc721Info,
-//   getErc721TokenInfo,
-//   getErc1155TokenInfo,
-// } from "./utils/web3";
+import {
+  getErc20Info,
+  getErc721Info,
+  getErc721TokenInfo,
+  getErc1155TokenInfo,
+} from "./utils/web3";
 
 // import { AbiDecoder } from "./utils/abi-decoder";
 // import uniqBy from "lodash";
@@ -104,11 +104,12 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           accountIds.push(to);
           const erc20TokenContract = await Erc20TokenContract.get(contractId) || newErc20TokenContracts.find(tk => tk.id === contractId);
           if (!erc20TokenContract) {
-            // const { name, symbol } = await getErc20Info(contractId);
+            const { name, symbol, decimals } = await getErc20Info(contractId);
             const newErc20TokenContract = new Erc20TokenContract(contractId);
             newErc20TokenContract.totalSupply = value;
-            // newErc20TokenContract.name = name;
-            // newErc20TokenContract.symbol = symbol;
+            newErc20TokenContract.name = name;
+            newErc20TokenContract.symbol = symbol;
+            newErc20TokenContract.decimals = decimals;
             newErc20TokenContracts.push(newErc20TokenContract);
           } else {
             if (from === NULL_ADDRESS) {
@@ -169,20 +170,20 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           accountIds.push(to);
           const erc721TokenContract = await Erc721TokenContract.get(contractId) || newErc721TokenContracts.find(tk => tk.id === contractId);
           if (!erc721TokenContract) {
-            // const { name, symbol } = await getErc721Info(contractId);
+            const { name, symbol } = await getErc721Info(contractId);
             const newErc721TokenContract = new Erc721TokenContract(contractId);
-            // newErc721TokenContract.name = name;
-            // newErc721TokenContract.symbol = symbol;
+            newErc721TokenContract.name = name;
+            newErc721TokenContract.symbol = symbol;
             newErc721TokenContracts.push(newErc721TokenContract);
           }
           const erc721TokenId = `${contractId}-${tokenId.toString()}`;
           const erc721Token = await Erc721Token.get(erc721TokenId) || newErc721Tokens.find(tk => tk.id === erc721TokenId);
           if (!erc721Token) {
-            // const { tokenURI } = await getErc721TokenInfo(contractId, tokenId);
+            const { tokenURI } = await getErc721TokenInfo(contractId, tokenId);
             const newErc721Token = new Erc721Token(erc721TokenId);
             newErc721Token.tokenContractId = contractId;
             newErc721Token.idInContract = tokenId;
-            // newErc721Token.tokenURI = tokenURI;
+            newErc721Token.tokenURI = tokenURI;
             newErc721Tokens.push(newErc721Token);
           }
 
@@ -268,11 +269,11 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           const erc1155TokenId = `${contractId}-${tokenId.toString()}`;
           const erc1155Token = await Erc1155Token.get(erc1155TokenId) || newErc1155Tokens.find(tk => tk.id === erc1155TokenId);
           if (!erc1155Token) {
-            // const { uri } = await getErc1155TokenInfo(contractId, tokenId);
+            const { uri } = await getErc1155TokenInfo(contractId, tokenId);
             const newErc1155Token = new Erc1155Token(erc1155TokenId);
             newErc1155Token.tokenContractId = contractId;
             newErc1155Token.idInContract = tokenId;
-            // newErc1155Token.uri = uri;
+            newErc1155Token.uri = uri;
             newErc1155Token.totalSupply = value;
             newErc1155Tokens.push(newErc1155Token);
           } else {

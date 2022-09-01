@@ -1,2 +1,2 @@
-// import {atob} from 'abab';
-// global.atob = atob;
+import {atob} from 'abab';
+global.atob = atob;

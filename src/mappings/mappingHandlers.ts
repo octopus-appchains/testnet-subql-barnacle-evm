@@ -22,17 +22,17 @@ import {
 } from "../types";
 import { AnyCall } from './types'
 import { getAccount, getAccountCode } from './moonbeam-handlers/utils/api';
-import { tryUpdateAccount } from './accounts';
+import { tryUpdateAccount, handleAccount } from './accounts';
 import { IEvent } from '@polkadot/types/types'
 import { CreatorIdMap } from './moonbeam-handlers/utils/types';
 import { handleExtrinsic, wrapExtrinsics } from './extrinsics';
-import { handleAccount } from './accounts';
 import { getBaseFee } from './moonbeam-handlers/utils/api';
 import { setBaseFeeSync } from "./moonbeam-handlers/transactions";
 import { jsonLog } from "./utils";
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
-  logger.debug("handleBlock==========");
+  logger.debug("handleBlock===========");
+  logger.debug(block.block.header.number.toBigInt());
   setBaseFeeSync(await getBaseFee());
   const newBlock = new Block(block.block.header.hash.toString())
   newBlock.number = block.block.header.number.toBigInt() || BigInt(0);
@@ -40,7 +40,7 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
   newBlock.parentHash = block.block.header.parentHash.toString();
   newBlock.specVersion = block.specVersion;
 
-  // Process all calls in block
+  // // Process all calls in block
   const wExtrinsics = wrapExtrinsics(block);
 
   let startEvtIdx = 0;

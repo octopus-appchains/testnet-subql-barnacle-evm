@@ -1,8 +1,9 @@
 
-import { Erc20__factory } from "../output";
-import { Erc721__factory } from "../output";
-import { Erc1155__factory } from "../output";
-import FrontierEthProvider from './ethProvider';
+import { Erc20__factory } from '../typechain/output';
+import { Erc721__factory } from '../typechain/output';
+import { Erc1155__factory } from '../typechain/output';
+import { FrontierEthProvider } from '@subql/frontier-evm-processor';
+import { jsonLog } from "../../utils";
 
 export async function getErc20Info(contractId: string) {
   const contract = Erc20__factory.connect(
@@ -11,12 +12,13 @@ export async function getErc20Info(contractId: string) {
   );
   const name = await contract.name();
   const symbol = await contract.symbol();
+  const decimals = await contract.decimals();
   return {
     name,
-    symbol
+    symbol,
+    decimals
   };
 }
-
 
 export async function getErc721Info(contractId: string) {
   const contract = Erc721__factory.connect(
