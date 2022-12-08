@@ -64,7 +64,7 @@ type Account @entity {
   reservedBalance: BigInt
   miscFrozenBalance: BigInt
   feeFrozenBalance: BigInt
-  isContract: Boolean @index
+  isContract: Boolean
   creator: Account @index
   createdAt: Date @index
   erc20TokenContract: Erc20TokenContract
