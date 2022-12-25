@@ -17,7 +17,7 @@ import {
   Erc1155Transfer,
   Erc1155Balance,
 } from "../../types";
-import { jsonLog } from "../utils";
+import { jsonLog } from "../utils/utils";
 import { erc20Abi } from "./abi/erc20";
 import {
   getErc20Info,

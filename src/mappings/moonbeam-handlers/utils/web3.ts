@@ -3,7 +3,7 @@ import { Erc20__factory } from '../typechain/output';
 import { Erc721__factory } from '../typechain/output';
 import { Erc1155__factory } from '../typechain/output';
 import { FrontierEthProvider } from '@subql/frontier-evm-processor';
-import { jsonLog } from "../../utils";
+import { jsonLog } from "../../utils/utils";
 
 export async function getErc20Info(contractId: string) {
   const contract = Erc20__factory.connect(

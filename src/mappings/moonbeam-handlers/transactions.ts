@@ -1,5 +1,5 @@
 import { Extrinsic, Transaction } from "../../types";
-import { humanNumberToBigInt, bigIntMin } from "../utils";
+import { humanNumberToBigInt, bigIntMin } from "../utils/utils";
 
 let baseFee: bigint | null = null;
 

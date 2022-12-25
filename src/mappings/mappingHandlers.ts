@@ -7,34 +7,34 @@ import {
   Block,
   Account,
   Event,
-  Extrinsic,
   Call,
   SystemTokenTransfer,
-  Transaction,
+  UpwardMessage,
+  NearToAppchainTransfer,
   EvmLog,
   Erc20Transfer,
   Erc20Balance,
   Erc20TokenContract,
   Erc721TokenContract,
-  Erc721Token,
   Erc721Transfer,
   Erc721Balance,
 } from "../types";
-import { AnyCall } from './types'
-import { getAccount, getAccountCode } from './moonbeam-handlers/utils/api';
 import { tryUpdateAccount, handleAccount } from './accounts';
-import { IEvent } from '@polkadot/types/types'
-import { CreatorIdMap } from './moonbeam-handlers/utils/types';
 import { handleExtrinsic, wrapExtrinsics } from './extrinsics';
 import { getBaseFee } from './moonbeam-handlers/utils/api';
 import { setBaseFeeSync } from "./moonbeam-handlers/transactions";
-import { jsonLog } from "./utils";
+import { handleUpwardMessages } from './bridgeMessages';
+import { storeBridgeMessageEvent } from './bridgeEvents';
+import { isEraEvent, isBridgeTransferEvent, isBridgeTransferEventOld } from './utils/matches';
+import { config } from "../config";
+
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
   logger.debug("handleBlock===========");
   logger.debug(block.block.header.number.toBigInt());
   setBaseFeeSync(await getBaseFee());
   const newBlock = new Block(block.block.header.hash.toString())
+  const newUpwardMessages: UpwardMessage[] = [];
   newBlock.number = block.block.header.number.toBigInt() || BigInt(0);
   newBlock.timestamp = block.timestamp;
   newBlock.parentHash = block.block.header.parentHash.toString();
@@ -57,6 +57,7 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
   const newCalls: Call[] = extrinsicWraps.reduce((cs, { newCalls }) => [...cs, ...newCalls], []);
   const newEvents: Event[] = extrinsicWraps.reduce((es, { newEvents }) => [...es, ...newEvents], []);
   const newSystemTokenTransfers: SystemTokenTransfer[] = extrinsicWraps.reduce((ss, { newSystemTokenTransfers }) => [...ss, ...newSystemTokenTransfers], []);
+  const newNearToAppchainTransfers: NearToAppchainTransfer[] = extrinsicWraps.reduce((ts, { newNearToAppchainTransfers }) => [...ts, ...newNearToAppchainTransfers], []);
   const newEvmLogs: EvmLog[] = extrinsicWraps.reduce((ls, { newEvmLogs }) => [...ls, ...newEvmLogs], []);
 
   const newErc20TokenContracts: Erc20TokenContract[] = extrinsicWraps.reduce((ts, { newErc20TokenContracts }) => [...ts, ...newErc20TokenContracts], []);
@@ -122,6 +123,19 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
     await store.bulkCreate("Erc1155Transfer", newErc1155Transfers),
     await store.bulkCreate("Erc1155Balance", newErc1155Balances)
   ]);
+
+  if (block.block.header.number.toBigInt() >= config.bridgeMessageStartAt.blockNumber) {
+    await Promise.all(block.events.map(async (evt, idx) => {
+      if (evt.event.section === "octopusUpwardMessages" && evt.event.method === "Committed") {
+        newUpwardMessages.push(...handleUpwardMessages(block, evt));
+      }
+      if (isEraEvent(evt.event) || isBridgeTransferEventOld(evt.event) || isBridgeTransferEvent(evt.event)) {
+        await storeBridgeMessageEvent(block, wExtrinsics, evt);
+      }
+    }));
+    await Promise.all(newUpwardMessages.map(async (data) => await data.save()))
+  }
+  await Promise.all(newNearToAppchainTransfers.map(async (data) => await data.save()))
 
   await updateStates([
     existsErc20TokenContracts,

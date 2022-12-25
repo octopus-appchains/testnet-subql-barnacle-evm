@@ -10,17 +10,19 @@ import {
   Transaction,
   EvmLog,
   Erc20Transfer,
-  Erc20TokenContract
+  Erc20TokenContract,
+  NearToAppchainTransfer
 } from "../types";
 import { CreatorIdMap } from './moonbeam-handlers/utils/types';
 import { handleCalls } from './calls';
 import { handleSystemTokenTransfer } from './systemTokenTransfer';
+import { handleAppchainToNearAccount, handleNearToAppchainTransfer } from "./bridgeEvents";
 import { handleEvent } from './event';
 import { handleTransaction } from "./moonbeam-handlers/transactions";
 import { handleEvmLogs } from "./moonbeam-handlers/evmLogs";
 import { handleTokenTransfers } from "./moonbeam-handlers/tokens";
 import _ from "lodash";
-import { jsonLog } from "./utils";
+import { jsonLog } from "./utils/utils";
 
 export function wrapExtrinsics(wrappedBlock: SubstrateBlock): WrappedExtrinsic[] {
   return wrappedBlock.block.extrinsics.map((extrinsic, idx) => {
@@ -74,6 +76,8 @@ export async function handleExtrinsic(
 
   const newEvents: Event[] = [];
   const newSystemTokenTransfers = [];
+  const newAppchainToNearAccounts = [];
+  const newNearToAppchainTransfers = [];
   const logEvts: EventRecord[] = [];
   const newTransactions: Transaction[] = [];
   let newEvmLogs = [];
@@ -86,6 +90,14 @@ export async function handleExtrinsic(
   extrinsic.events
     .forEach((evt, idx) => {
       newEvents.push(handleEvent(block, extrinsic, evt, extrinsicId, startEvtIdx + idx));
+      if (evt.event.section === "octopusBridge") {
+        if (["Locked", "Nep141Burned", "NonfungibleLocked"].includes(evt.event.method)) {
+          newAppchainToNearAccounts.push(handleAppchainToNearAccount(evt.event))
+        }
+        if (["Unlocked", "Nep141Minted", "NonfungibleUnlocked"].includes(evt.event.method)) {
+          newNearToAppchainTransfers.push(handleNearToAppchainTransfer(block, extrinsic, evt.event, extrinsicId, startEvtIdx + idx))
+        }
+      }
       if (evt.event.section === "balances" && evt.event.method === "Transfer") {
         newSystemTokenTransfers.push(handleSystemTokenTransfer(block, extrinsic, evt, extrinsicId, startEvtIdx + idx));
       } else if (evt.event.section === "balances" && (evt.event.method === "Withdraw" || evt.event.method === "Deposit")) {
@@ -122,11 +134,20 @@ export async function handleExtrinsic(
     creatorIdMap[t.toId] = null;
   });
 
+  newAppchainToNearAccounts.forEach(t => {
+    creatorIdMap[t.senderId] = null;
+  });
+
+  newNearToAppchainTransfers.forEach(t => {
+    creatorIdMap[t.receiverId] = null;
+  });
+
   const result = {
     newExtrinsic,
     newCalls,
     newEvents,
     newSystemTokenTransfers,
+    newNearToAppchainTransfers,
     creatorIdMap,
     newEvmLogs: [],
     newTransactions,
