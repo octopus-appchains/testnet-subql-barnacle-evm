@@ -65,7 +65,7 @@ export function storeAppchainToNearTransfer(
   let newAppchainToNearTransfer = new AppchainToNearTransfer(sequence.toString().replaceAll(',', ''));
   if (["Locked"].includes(method)) {
     const [sender, receiver, amount] = data;
-    newAppchainToNearTransfer.senderId = sender.toString();
+    newAppchainToNearTransfer.senderId = sender.toString().toLowerCase();
     newAppchainToNearTransfer.receiver = Buffer.from(receiver.toHex().replace("0x", ""), "hex").toString("utf8");
     newAppchainToNearTransfer.type = method;
     newAppchainToNearTransfer.amount = BigInt(amount.toString().replaceAll(',', ''));
@@ -73,7 +73,7 @@ export function storeAppchainToNearTransfer(
     newAppchainToNearTransfer.sequence = sequence;
   } else if (["AssetBurned", "Nep141Burned"].includes(method)) {
     const [assetId, sender, receiver, amount] = data;
-    newAppchainToNearTransfer.senderId = sender.toString();
+    newAppchainToNearTransfer.senderId = sender.toString().toLowerCase();
     newAppchainToNearTransfer.receiver = Buffer.from(receiver.toHex().replace("0x", ""), "hex").toString("utf8");
     newAppchainToNearTransfer.type = method;
     newAppchainToNearTransfer.assetId = Number(assetId.toString().replaceAll(',', ''));
@@ -82,7 +82,7 @@ export function storeAppchainToNearTransfer(
     newAppchainToNearTransfer.sequence = sequence;
   } else if (["NftLocked", "NonfungibleLocked"].includes(method)) {
     const [collection, item, sender, receiver] = data;
-    newAppchainToNearTransfer.senderId = sender.toString();
+    newAppchainToNearTransfer.senderId = sender.toString().toLowerCase();
     newAppchainToNearTransfer.receiver = Buffer.from(receiver.toHex().replace("0x", ""), "hex").toString("utf8");
     newAppchainToNearTransfer.type = method;
     newAppchainToNearTransfer.collection = BigInt(collection.toString().replaceAll(',', ''));
@@ -102,13 +102,13 @@ export function handleAppchainToNearAccount(
   let appchainToNearAccount = { senderId: undefined };
   if (["Locked"].includes(method)) {
     const [sender] = data;
-    appchainToNearAccount.senderId = sender.toString();
+    appchainToNearAccount.senderId = sender.toString().toLowerCase();
   } else if (["AssetBurned", "Nep141Burned"].includes(method)) {
     const [assetId, sender] = data;
-    appchainToNearAccount.senderId = sender.toString();
+    appchainToNearAccount.senderId = sender.toString().toLowerCase();
   } else if (["NftLocked", "NonfungibleLocked"].includes(method)) {
     const [collection, item, sender] = data;
-    appchainToNearAccount.senderId = sender.toString();
+    appchainToNearAccount.senderId = sender.toString().toLowerCase();
   }
   return appchainToNearAccount;
 }
@@ -128,7 +128,7 @@ export function handleNearToAppchainTransfer(
   if (["Unlocked", "UnlockFailed"].includes(method)) {
     const [sender, receiver, amount, sequence] = data;
     newNearToAppchainTransfer.sender = Buffer.from(sender.toHex().replace("0x", ""), "hex").toString("utf8");
-    newNearToAppchainTransfer.receiverId = receiver.toString();
+    newNearToAppchainTransfer.receiverId = receiver.toString().toLowerCase();
     newNearToAppchainTransfer.type = method;
     newNearToAppchainTransfer.amount = BigInt(amount.toString().replaceAll(',', ''));
     newNearToAppchainTransfer.sequence = Number(sequence.toString().replaceAll(',', ''));
@@ -140,7 +140,7 @@ export function handleNearToAppchainTransfer(
   ].includes(method)) {
     const [assetId, sender, receiver, amount, sequence] = data;
     newNearToAppchainTransfer.sender = Buffer.from(sender.toHex().replace("0x", ""), "hex").toString("utf8");
-    newNearToAppchainTransfer.receiverId = receiver.toString();
+    newNearToAppchainTransfer.receiverId = receiver.toString().toLowerCase();
     newNearToAppchainTransfer.type = method;
     newNearToAppchainTransfer.assetId = Number(assetId.toString().replaceAll(',', ''));
     newNearToAppchainTransfer.amount = BigInt(amount.toString().replaceAll(',', ''));
@@ -153,7 +153,7 @@ export function handleNearToAppchainTransfer(
   ].includes(method)) {
     const [collection, item, sender, receiver, sequence] = data;
     newNearToAppchainTransfer.sender = Buffer.from(sender.toHex().replace("0x", ""), "hex").toString("utf8");
-    newNearToAppchainTransfer.receiverId = receiver.toString();
+    newNearToAppchainTransfer.receiverId = receiver.toString().toLowerCase();
     newNearToAppchainTransfer.type = method;
     newNearToAppchainTransfer.collection = BigInt(collection.toString().replaceAll(',', ''));
     newNearToAppchainTransfer.item = BigInt(item.toString().replaceAll(',', ''));
