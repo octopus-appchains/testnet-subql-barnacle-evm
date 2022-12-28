@@ -2,7 +2,9 @@ version: "3"
 
 services:
   postgres:
-    image: postgres:12-alpine
+    build:
+      context: .
+      dockerfile: ./docker/pg-Dockerfile
     ports:
       - 5432:5432
     volumes:
@@ -28,10 +30,11 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
     volumes:
-      - ./:/testnet-subql-barnacle-evm
+      - ./:/app
     command:
-      - -f=/testnet-subql-barnacle-evm
-      - --db-schema=testnet-subql-barnacle-evm
+      - -f=/app
+      - --db-schema=app
+      - --disable-historical=true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://subquery-node:3000/ready"]
       interval: 3s
@@ -55,6 +58,6 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
     command:
-      - --name=testnet-subql-barnacle-evm
+      - --name=app
       - --playground
       - --indexer=http://subquery-node:3000

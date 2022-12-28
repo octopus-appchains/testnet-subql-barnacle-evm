@@ -11,6 +11,7 @@ export function handleUpwardMessages(
   const humanData: any = data.toHuman();
   return humanData.data.map(({ nonce, payloadType, payload }: any) => {
     const newUpwardMessage = new UpwardMessage(nonce.replaceAll(',', ''));
+    newUpwardMessage.sequence = Number(nonce.replaceAll(',', ''));
     newUpwardMessage.payloadType = payloadType.toString();
     newUpwardMessage.payload = payload.toString();
 
