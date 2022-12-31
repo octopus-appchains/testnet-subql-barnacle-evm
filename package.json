@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "subql build",
-    "subql-publish": "subql publish",
+    "subql-publish": "./scripts/build.sh && subql publish",
     "subql-debug": "./scripts/build.sh && subql-node -f . --debug",
     "prepack": "rm -rf dist && npm build",
     "test": "jest",
