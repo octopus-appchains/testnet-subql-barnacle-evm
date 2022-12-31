@@ -81,7 +81,7 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
 
   const creatorIdMap = extrinsicWraps.reduce((am, { creatorIdMap }) => {
     Object.keys(creatorIdMap).forEach((key) => {
-      am[key] = am[key] || creatorIdMap[key];
+      am[key.toLowerCase()] = am[key.toLowerCase()] || creatorIdMap[key];
     });
     return am;
   }, {});
