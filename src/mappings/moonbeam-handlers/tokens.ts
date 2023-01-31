@@ -104,9 +104,9 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
           accountIds.push(to);
           const erc20TokenContract = await Erc20TokenContract.get(contractId) || newErc20TokenContracts.find(tk => tk.id === contractId);
           if (!erc20TokenContract) {
-            const { name, symbol, decimals } = await getErc20Info(contractId);
+            const { name, symbol, decimals, totalSupply } = await getErc20Info(contractId);
             const newErc20TokenContract = new Erc20TokenContract(contractId);
-            newErc20TokenContract.totalSupply = value;
+            newErc20TokenContract.totalSupply = totalSupply.toBigInt();
             newErc20TokenContract.name = name;
             newErc20TokenContract.symbol = symbol;
             newErc20TokenContract.decimals = decimals;

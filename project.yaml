@@ -15,7 +15,7 @@ schema:
 network:
   endpoint: >-
     wss://gateway.testnet.octopus.network/barnacle-evm/wj1hhcverunusc35jifki19otd4od1n5
-  genesisHash: "0x49c76ef3ec0e3931db706b8df850b3e57bf0637a74ac72d0ae3d8242bc0c2a35"
+  genesisHash: "0xaf4fcd6531f248060ddf6e9be4630522d85eaa33a3a130767cd30811b2f02fdd"
   chaintypes:
     file: ./dist/chaintypes.js
 dataSources:

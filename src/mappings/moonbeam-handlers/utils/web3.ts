@@ -13,10 +13,12 @@ export async function getErc20Info(contractId: string) {
   const name = await contract.name();
   const symbol = await contract.symbol();
   const decimals = await contract.decimals();
+  const totalSupply = await contract.totalSupply();
   return {
     name,
     symbol,
-    decimals
+    decimals,
+    totalSupply
   };
 }
 
