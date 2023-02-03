@@ -103,7 +103,7 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
   await store.bulkCreate("Transaction", newTransactions);
   await Promise.all([
     await store.bulkCreate("Erc20TokenContract", newErc20TokenContracts),
-    // await store.bulkCreate("Erc721TokenContract", newErc721TokenContracts),
+    await store.bulkCreate("Erc721TokenContract", newErc721TokenContracts),
     await store.bulkCreate("Erc1155TokenContract", newErc1155TokenContracts)
   ]);
   await Promise.all([
