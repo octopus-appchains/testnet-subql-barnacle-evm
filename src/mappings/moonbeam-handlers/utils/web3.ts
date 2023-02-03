@@ -5,6 +5,14 @@ import { Erc1155__factory } from '../typechain/output';
 import { FrontierEthProvider } from '@subql/frontier-evm-processor';
 import { jsonLog } from "../../utils/utils";
 
+export async function getErc20BalanceOf(contractId: string, address: string) {
+  const contract = Erc20__factory.connect(
+    contractId,
+    new FrontierEthProvider()
+  );
+  return await contract.balanceOf(address);
+}
+
 export async function getErc20Info(contractId: string) {
   const contract = Erc20__factory.connect(
     contractId,

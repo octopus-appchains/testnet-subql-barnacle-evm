@@ -24,6 +24,7 @@ import {
   getErc721Info,
   getErc721TokenInfo,
   getErc1155TokenInfo,
+  getErc20BalanceOf,
 } from "./utils/web3";
 
 // import { AbiDecoder } from "./utils/abi-decoder";
@@ -132,22 +133,24 @@ export async function handleTokenTransfers(evmLogs: EvmLog[], transactionId: str
             })
           );
 
-          balances.forEach(({ balanceId, accountId, erc20Balance }) => {
+
+          await Promise.all(balances.map(async ({ balanceId, accountId, erc20Balance }) => {
+            const accountBalance = await getErc20BalanceOf(contractId, accountId);
             if (!erc20Balance) {
               const newErc20Balance = new Erc20Balance(balanceId);
               newErc20Balance.accountId = accountId;
               newErc20Balance.tokenContractId = contractId;
-              newErc20Balance.value = to === accountId ? value : BigInt(0);
+              newErc20Balance.value = to === accountId ? value + accountBalance.toBigInt() : accountBalance.toBigInt();
               newErc20Balances.push(newErc20Balance);
             } else {
               if (from === accountId) {
-                erc20Balance.value -= value;
+                erc20Balance.value = accountBalance.toBigInt() - value;
               } else if (to === accountId) {
-                erc20Balance.value += value;
+                erc20Balance.value = accountBalance.toBigInt() + value;
               }
               existsErc20Balances.push(erc20Balance);
             }
-          });
+          }))
 
           const newErc20Transfer = new Erc20Transfer(`erc20tx-${transactionId}-${log.logIndex}`);
           newErc20Transfer.fromId = from;
